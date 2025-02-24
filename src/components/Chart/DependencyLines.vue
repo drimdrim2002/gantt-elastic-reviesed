@@ -18,7 +18,11 @@
     <g v-for="task in dependencyTasks" :key="task.id" :task="task">
       <path
         class="gantt-elastic__chart-dependency-lines-path"
-        :style="{ ...root.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path'], ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id] }"
+        :style="{
+          ...root.style['chart-dependency-lines-path'],
+          ...task.style['chart-dependency-lines-path'],
+          ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id]
+        }"
         v-for="dependencyLine in task.dependencyLines"
         :key="dependencyLine.id"
         :task="task"

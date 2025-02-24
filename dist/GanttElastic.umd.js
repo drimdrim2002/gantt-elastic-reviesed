@@ -3744,7 +3744,10 @@ var DependencyLinesvue_type_template_id_f1cbf6ba_render = function() {
             style: Object.assign(
               {},
               _vm.root.style["chart-dependency-lines-path"],
-              task.style["chart-dependency-lines-path"]
+              task.style["chart-dependency-lines-path"],
+              task.style[
+                "chart-dependency-lines-path-" + dependencyLine.task_id
+              ]
             ),
             attrs: { task: task, d: dependencyLine.points }
           })
@@ -3762,6 +3765,10 @@ DependencyLinesvue_type_template_id_f1cbf6ba_render._withStripped = true
 // CONCATENATED MODULE: ./src/components/Chart/DependencyLines.vue?vue&type=template&id=f1cbf6ba&
 
 // CONCATENATED MODULE: ./node_modules/vue-loader/lib??vue-loader-options!./src/components/Chart/DependencyLines.vue?vue&type=script&lang=js&
+//
+//
+//
+//
 //
 //
 //
@@ -3872,7 +3879,7 @@ DependencyLinesvue_type_template_id_f1cbf6ba_render._withStripped = true
         .filter(task => typeof task.dependentOn !== 'undefined')
         .map(task => {
           task.dependencyLines = task.dependentOn.map(id => {
-            return { points: this.getPoints(id, task.id) };
+            return { points: this.getPoints(id, task.id), task_id: id };
           });
           return task;
         })
