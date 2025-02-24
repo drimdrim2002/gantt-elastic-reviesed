@@ -1400,6 +1400,15 @@ const GanttElastic = {
       this.calculateTaskListColumnsDimensions();
       this.$emit('calendar-recalculate');
       this.syncScrollTop();
+    },
+
+    updateSelectedTasks(selectedTasks) {
+      this.state.selectedTasks = selectedTasks;
+      // 상위 컴포넌트로 이벤트 전달
+      this.$emit('task-selected', {
+        selectedTasks,
+        count: selectedTasks.length
+      });
     }
   },
 

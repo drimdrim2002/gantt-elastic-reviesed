@@ -1,8 +1,10 @@
 <template>
   <div style="width:100%;height:100%">
-    <gantt-elastic :tasks="tasks" :options="options">
+    <gantt-elastic :tasks="tasks" :options="options" @task-selected="onTaskSelected">
       <gantt-header slot="header"></gantt-header>
     </gantt-elastic>
+    <!-- 선택된 task 개수 표시 -->
+    <div class="selected-tasks-count">선택된 Task: {{ selectedTasksCount }}개</div>
   </div>
 </template>
 
@@ -20,6 +22,7 @@ export default {
   data() {
     return {
       tasks: this.getTasks(),
+      selectedTasksCount: 0,
       options: {
         title: {
           label: 'Your project title as html (link or whatever...)',
@@ -179,10 +182,13 @@ export default {
           row: 2
         }
       ];
+    },
+    onTaskSelected({ selectedTasks, count }) {
+      console.log('Task selected:', selectedTasks, count);
+      this.selectedTasksCount = count;
     }
   },
   mounted() {
-    // 이벤트 리스너 설정
     this.$root.$on('gantt-elastic-ready', ganttElasticInstance => {
       ganttElasticInstance.$on('tasks-changed', tasks => {
         this.tasks = tasks;
@@ -201,5 +207,18 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+.selected-tasks-count {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #42b983;
+  color: red;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 </style>

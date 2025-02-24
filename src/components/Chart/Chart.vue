@@ -68,6 +68,7 @@
                 @chart-task-click="onTaskClick"
                 @chart-task-taskDragging="onTaskDragging"
                 @chart-task-taskDragEnd="onTaskDragEnd"
+                @task-selected="onTaskSelected"
               ></component>
             </g>
           </svg>
@@ -154,6 +155,10 @@ export default {
       const { task } = event.data;
       this.root.$emit('task-moved', task);
     },
+    onTaskSelected(event) {
+      // root의 state를 직접 업데이트
+      this.root.updateSelectedTasks(event.selectedTasks);
+    },
     startSelection(event) {
       const rect = this.$refs.chartGraph.getBoundingClientRect();
       this.selectionStart = {
@@ -194,7 +199,19 @@ export default {
         return taskRect.left < right && taskRect.right > left && taskRect.top < bottom && taskRect.bottom > top;
       });
 
-      this.root.state.selectedTasks = selectedTasks;
+      // 선택된 task가 있고, 모두 같은 row에 있는지 확인
+      if (selectedTasks.length > 0) {
+        const firstRow = selectedTasks[0].row;
+        const allSameRow = selectedTasks.every(task => task.row === firstRow);
+
+        if (!allSameRow) {
+          alert('다른 row의 task는 선택할 수 없습니다.');
+          this.isSelecting = false;
+          return;
+        }
+      }
+
+      this.root.updateSelectedTasks(selectedTasks);
     }
   }
 };

@@ -15,7 +15,6 @@
       ...task.style['chart-row-bar-wrapper']
     }"
     :class="{ selected: isSelected }"
-    @click="onTaskClick"
   >
     <foreignObject
       class="gantt-elastic__chart-expander gantt-elastic__chart-expander--task"
@@ -47,7 +46,7 @@
       :width="task.width"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
-      @click.stop="onTaskClick"
+      @click="onTaskClick"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
@@ -126,6 +125,8 @@ export default {
   },
   methods: {
     onTaskClick(event) {
+      event.stopPropagation(); // 이벤트 버블링만 중단
+
       if (event.shiftKey) {
         const selectedTasks = this.root.state.selectedTasks || [];
         if (selectedTasks.length > 0 && !selectedTasks.every(t => t.row === this.task.row)) {
@@ -133,36 +134,34 @@ export default {
           return;
         }
 
-        this.isSelected = !this.isSelected;
-        if (this.isSelected) {
-          this.root.state.selectedTasks = [...selectedTasks, this.task];
+        // Shift 키를 누른 상태에서는 기존 선택에 추가/제거
+        const isCurrentlySelected = selectedTasks.some(t => t.id === this.task.id);
+        if (isCurrentlySelected) {
+          // 이미 선택된 task라면 제거
+          this.root.updateSelectedTasks(selectedTasks.filter(t => t.id !== this.task.id));
         } else {
-          this.root.state.selectedTasks = selectedTasks.filter(t => t.id !== this.task.id);
+          // 선택되지 않은 task라면 추가
+          this.root.updateSelectedTasks([...selectedTasks, this.task]);
         }
-        this.$emit('task-selected', {
-          task: this.task,
-          selected: this.isSelected,
-          event
-        });
       } else {
-        if (this.isSelected) {
-          this.isSelected = false;
-          this.root.state.selectedTasks = (this.root.state.selectedTasks || []).filter(t => t.id !== this.task.id);
-        } else {
-          console.log('else');
-          if (this.root.state.selectedTasks) {
-            this.root.state.selectedTasks = [];
-          }
-          this.root.state.selectedTasks = [this.task];
-          this.isSelected = true;
-        }
+        // 일반 클릭 시에는 토글 동작
+        const selectedTasks = this.root.state.selectedTasks || [];
+        const isCurrentlySelected = selectedTasks.some(t => t.id === this.task.id);
 
-        this.$emit('task-selected', {
-          task: this.task,
-          selected: this.isSelected,
-          event
-        });
+        if (isCurrentlySelected) {
+          // 이미 선택된 task라면 선택 해제
+          this.root.updateSelectedTasks([]);
+        } else {
+          // 선택되지 않은 task라면 선택
+          this.root.updateSelectedTasks([this.task]);
+        }
       }
+
+      // 클릭 이벤트 발생 후 task-selected 이벤트도 발생
+      this.$emit('task-selected', {
+        selectedTasks: this.root.state.selectedTasks,
+        count: this.root.state.selectedTasks.length
+      });
 
       this.emitEvent('click', event);
     },
