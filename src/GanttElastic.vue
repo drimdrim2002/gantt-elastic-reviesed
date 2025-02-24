@@ -462,6 +462,7 @@ const GanttElastic = {
     return {
       state: {
         tasks: [],
+        selectedTasks: [],
         options: {
           scrollBarHeight: 0,
           allVisibleTasksHeight: 0,

@@ -143,8 +143,40 @@ export default {
           duration: 2 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
-          dependentOn: [3],
           row: 1
+        },
+        {
+          id: 5,
+          label: 'Courage is being scared to death, but saddling up anyway.',
+          user:
+            '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
+          start: this.getDate(-24 * 1),
+          duration: 0.5 * 24 * 60 * 60 * 1000,
+          progress: 100,
+          type: 'task',
+          row: 2
+        },
+        {
+          id: 6,
+          label: 'Put that toy AWAY!',
+          user:
+            '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
+          start: this.getDate(-24 * 2),
+          duration: 0.5 * 24 * 60 * 60 * 1000,
+          progress: 50,
+          type: 'task',
+          row: 2
+        },
+        {
+          id: 7,
+          label: 'Put that toy AWAY!',
+          user:
+            '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
+          start: this.getDate(-24 * 1.5),
+          duration: 0.3 * 24 * 60 * 60 * 1000,
+          progress: 50,
+          type: 'task',
+          row: 2
         }
       ];
     }

@@ -36,14 +36,16 @@
         ...root.style['chart-row-bar'],
         ...root.style['chart-row-task'],
         ...task.style['chart-row-bar'],
-        cursor: isDragging ? 'grabbing' : 'grab'
+        cursor: isDragging ? 'grabbing' : 'grab',
+        opacity: isSelected ? '0.8' : '1',
+        outline: isSelected ? '2px solid #42b983' : 'none'
       }"
       :x="task.x"
       :y="task.y"
       :width="task.width"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
-      @click="emitEvent('click', $event)"
+      @click.stop="onTaskClick"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
@@ -96,8 +98,8 @@ export default {
       isDragging: false,
       dragStartX: 0,
       dragStartY: 0,
-      originalX: 0,
-      originalY: 0
+      originalPositions: [],
+      isSelected: false
     };
   },
   computed: {
@@ -121,15 +123,71 @@ export default {
     }
   },
   methods: {
+    onTaskClick(event) {
+      if (event.shiftKey) {
+        const selectedTasks = this.root.state.selectedTasks || [];
+        if (selectedTasks.length > 0 && !selectedTasks.every(t => t.row === this.task.row)) {
+          alert('다른 row의 task는 선택할 수 없습니다.');
+          return;
+        }
+
+        this.isSelected = !this.isSelected;
+        if (this.isSelected) {
+          this.root.state.selectedTasks = [...selectedTasks, this.task];
+        } else {
+          this.root.state.selectedTasks = selectedTasks.filter(t => t.id !== this.task.id);
+        }
+        this.$emit('task-selected', {
+          task: this.task,
+          selected: this.isSelected,
+          event
+        });
+      } else {
+        if (this.isSelected) {
+          this.isSelected = false;
+          this.root.state.selectedTasks = (this.root.state.selectedTasks || []).filter(t => t.id !== this.task.id);
+        } else {
+          console.log('else');
+          if (this.root.state.selectedTasks) {
+            this.root.state.selectedTasks = [];
+          }
+          this.root.state.selectedTasks = [this.task];
+          this.isSelected = true;
+        }
+
+        this.$emit('task-selected', {
+          task: this.task,
+          selected: this.isSelected,
+          event
+        });
+      }
+
+      this.emitEvent('click', event);
+    },
+
     onDragStart(event) {
       event.preventDefault();
       event.stopPropagation();
 
+      if (!event.shiftKey) {
+        if (this.root.state.selectedTasks) {
+          this.root.state.selectedTasks = [];
+        }
+        this.root.state.selectedTasks = [this.task];
+        this.isSelected = true;
+      }
+
       this.isDragging = true;
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
-      this.originalX = this.task.x;
-      this.originalY = this.task.y;
+
+      // 선택된 모든 task의 원래 위치를 저장
+      const selectedTasks = this.root.state.selectedTasks || [];
+      const initialPositions = selectedTasks.map(task => ({
+        id: task.id,
+        x: task.x,
+        y: task.y
+      }));
 
       const onMouseMove = e => {
         if (!this.isDragging) return;
@@ -140,36 +198,51 @@ export default {
         const dx = e.clientX - this.dragStartX;
         const dy = e.clientY - this.dragStartY;
 
-        const newX = this.originalX + dx;
-        const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
-        const newRow = Math.floor((this.originalY + dy) / rowHeight);
-        const newY = newRow * rowHeight + rowHeight / 2 - this.task.height / 2;
+        // 선택된 모든 task 이동
+        selectedTasks.forEach(selectedTask => {
+          // 저장된 원래 위치 찾기
+          const originalPosition = initialPositions.find(pos => pos.id === selectedTask.id);
+          if (!originalPosition) return;
 
-        this.task.x = newX;
-        this.task.y = newY;
+          // 새로운 위치 계산
+          const newX = originalPosition.x + dx;
+          const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
+          const newRow = Math.floor((originalPosition.y + dy) / rowHeight);
+          const newY = newRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
 
-        const newStartTime = this.root.pixelOffsetXToTime(newX);
-        this.task.start = newStartTime;
+          // task 위치 업데이트
+          selectedTask.x = newX;
+          selectedTask.y = newY;
 
-        this.task.row = Math.max(0, newRow);
+          // 시간 업데이트
+          const newStartTime = this.root.pixelOffsetXToTime(newX);
+          selectedTask.start = newStartTime;
 
-        this.emitEvent('taskDragging', { task: this.task, event: e });
+          // row 업데이트
+          selectedTask.row = Math.max(0, newRow);
+        });
+
+        this.emitEvent('taskDragging', { tasks: selectedTasks, event: e });
       };
 
       const onMouseUp = e => {
         e.preventDefault();
         e.stopPropagation();
 
+        // 선택된 모든 task의 최종 위치 조정
         const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
-        const finalRow = Math.floor(this.task.y / rowHeight);
-        this.task.y = finalRow * rowHeight + rowHeight / 2 - this.task.height / 2;
-        this.task.row = Math.max(0, finalRow);
+
+        selectedTasks.forEach(selectedTask => {
+          const finalRow = Math.floor(selectedTask.y / rowHeight);
+          selectedTask.y = finalRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
+          selectedTask.row = Math.max(0, finalRow);
+        });
 
         this.isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
-        this.emitEvent('taskDragEnd', { task: this.task, event: e });
+        this.emitEvent('taskDragEnd', { tasks: selectedTasks, event: e });
       };
 
       document.addEventListener('mousemove', onMouseMove);
@@ -189,6 +262,14 @@ export default {
 
       this.emitEvent('taskDragEnd', { task: this.task, event });
     }
+  },
+  watch: {
+    'root.state.selectedTasks': {
+      handler(newSelectedTasks) {
+        this.isSelected = newSelectedTasks.some(t => t.id === this.task.id);
+      },
+      deep: true
+    }
   }
 };
 </script>
@@ -204,5 +285,10 @@ export default {
 
 .gantt-elastic__chart-row-bar:active {
   cursor: grabbing !important;
+}
+
+.gantt-elastic__chart-row-bar.selected {
+  opacity: 0.8;
+  outline: 2px solid #42b983;
 }
 </style>
