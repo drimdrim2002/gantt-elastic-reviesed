@@ -14,6 +14,8 @@
       ...root.style['chart-row-task-wrapper'],
       ...task.style['chart-row-bar-wrapper']
     }"
+    :class="{ selected: isSelected }"
+    @click="onTaskClick"
   >
     <foreignObject
       class="gantt-elastic__chart-expander gantt-elastic__chart-expander--task"
@@ -266,9 +268,10 @@ export default {
   watch: {
     'root.state.selectedTasks': {
       handler(newSelectedTasks) {
-        this.isSelected = newSelectedTasks.some(t => t.id === this.task.id);
+        this.isSelected = newSelectedTasks.some(task => task.id === this.task.id);
       },
-      deep: true
+      deep: true,
+      immediate: true
     }
   }
 };
@@ -290,5 +293,10 @@ export default {
 .gantt-elastic__chart-row-bar.selected {
   opacity: 0.8;
   outline: 2px solid #42b983;
+}
+
+.selected {
+  stroke: #42b983;
+  stroke-width: 2px;
 }
 </style>
