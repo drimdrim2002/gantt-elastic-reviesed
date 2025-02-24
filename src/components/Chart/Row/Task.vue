@@ -32,7 +32,12 @@
     </foreignObject>
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-task"
-      :style="{ ...root.style['chart-row-bar'], ...root.style['chart-row-task'], ...task.style['chart-row-bar'] }"
+      :style="{
+        ...root.style['chart-row-bar'],
+        ...root.style['chart-row-task'],
+        ...task.style['chart-row-bar'],
+        cursor: isDragging ? 'grabbing' : 'grab'
+      }"
       :x="task.x"
       :y="task.y"
       :width="task.width"
@@ -42,9 +47,7 @@
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
-      @mousemove="emitEvent('mousemove', $event)"
-      @mousedown="emitEvent('mousedown', $event)"
-      @mouseup="emitEvent('mouseup', $event)"
+      @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
       @touchmove="emitEvent('touchmove', $event)"
@@ -77,6 +80,7 @@ import ChartText from '../Text.vue';
 import ProgressBar from '../ProgressBar.vue';
 import Expander from '../../Expander.vue';
 import taskMixin from './Task.mixin.js';
+
 export default {
   name: 'Task',
   components: {
@@ -88,7 +92,13 @@ export default {
   props: ['task'],
   mixins: [taskMixin],
   data() {
-    return {};
+    return {
+      isDragging: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      originalX: 0,
+      originalY: 0
+    };
   },
   computed: {
     /**
@@ -109,6 +119,90 @@ export default {
       const task = this.task;
       return `0,0 ${task.width},0 ${task.width},${task.height} 0,${task.height}`;
     }
+  },
+  methods: {
+    onDragStart(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.isDragging = true;
+      this.dragStartX = event.clientX;
+      this.dragStartY = event.clientY;
+      this.originalX = this.task.x;
+      this.originalY = this.task.y;
+
+      const onMouseMove = e => {
+        if (!this.isDragging) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dx = e.clientX - this.dragStartX;
+        const dy = e.clientY - this.dragStartY;
+
+        const newX = this.originalX + dx;
+        const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
+        const newRow = Math.floor((this.originalY + dy) / rowHeight);
+        const newY = newRow * rowHeight + rowHeight / 2 - this.task.height / 2;
+
+        this.task.x = newX;
+        this.task.y = newY;
+
+        const newStartTime = this.root.pixelOffsetXToTime(newX);
+        this.task.start = newStartTime;
+
+        this.task.row = Math.max(0, newRow);
+
+        this.emitEvent('taskDragging', { task: this.task, event: e });
+      };
+
+      const onMouseUp = e => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
+        const finalRow = Math.floor(this.task.y / rowHeight);
+        this.task.y = finalRow * rowHeight + rowHeight / 2 - this.task.height / 2;
+        this.task.row = Math.max(0, finalRow);
+
+        this.isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+
+        this.emitEvent('taskDragEnd', { task: this.task, event: e });
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      this.emitEvent('mousedown', event);
+    },
+
+    onDragEnd(event) {
+      event.preventDefault();
+      if (!this.isDragging) return;
+
+      this.isDragging = false;
+
+      document.removeEventListener('mousemove', this.onDragging);
+      document.removeEventListener('mouseup', this.onDragEnd);
+
+      this.emitEvent('taskDragEnd', { task: this.task, event });
+    }
   }
 };
 </script>
+
+<style scoped>
+.gantt-elastic__chart-row-bar-wrapper {
+  user-select: none;
+}
+
+.gantt-elastic__chart-row-bar {
+  cursor: grab;
+}
+
+.gantt-elastic__chart-row-bar:active {
+  cursor: grabbing !important;
+}
+</style>

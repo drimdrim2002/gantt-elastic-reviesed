@@ -59,7 +59,13 @@
               :task="task"
               :key="task.id"
             >
-              <component :task="task" :is="task.type"></component>
+              <component
+                :task="task"
+                :is="task.type"
+                @chart-task-click="onTaskClick"
+                @chart-task-taskDragging="onTaskDragging"
+                @chart-task-taskDragEnd="onTaskDragEnd"
+              ></component>
             </g>
           </svg>
         </div>
@@ -112,6 +118,23 @@ export default {
      */
     getViewBox() {
       return `0 0 ${this.root.state.options.width} ${this.root.state.options.allVisibleTasksHeight}`;
+    }
+  },
+
+  methods: {
+    onTaskClick(event) {
+      const task = event.data;
+      alert(`Task clicked: ${task.label}`);
+      // 필요한 경우 이벤트를 상위로 전달
+      this.root.$emit('task-click', task);
+    },
+    onTaskDragging(event) {
+      const { task } = event.data;
+      this.root.$emit('task-dragging', task);
+    },
+    onTaskDragEnd(event) {
+      const { task } = event.data;
+      this.root.$emit('task-moved', task);
     }
   }
 };
