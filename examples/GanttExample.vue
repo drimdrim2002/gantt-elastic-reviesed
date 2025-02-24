@@ -25,6 +25,11 @@ export default {
           label: 'Your project title as html (link or whatever...)',
           html: false
         },
+        row: {
+          height: 24
+        },
+        maxRows: 100,
+        maxHeight: 0,
         taskList: {
           columns: [
             {
@@ -96,20 +101,21 @@ export default {
           user:
             '<a href="https://www.google.com/search?q=John+Doe" target="_blank" style="color:#0077c0;">John Doe</a>',
           start: this.getDate(-24 * 5),
-          duration: 5 * 24 * 60 * 60 * 1000,
+          duration: 2 * 24 * 60 * 60 * 1000,
           progress: 85,
-          type: 'project'
+          type: 'task',
+          row: 0
         },
         {
           id: 2,
           label: 'With great power comes great responsibility',
           user:
             '<a href="https://www.google.com/search?q=Peter+Parker" target="_blank" style="color:#0077c0;">Peter Parker</a>',
-          parentId: 1,
-          start: this.getDate(-24 * 4),
-          duration: 4 * 24 * 60 * 60 * 1000,
+          start: this.getDate(-24 * 3),
+          duration: 1 * 24 * 60 * 60 * 1000,
           progress: 50,
-          type: 'milestone',
+          type: 'task',
+          row: 0,
           style: {
             base: {
               fill: '#1EBC61',
@@ -122,11 +128,11 @@ export default {
           label: 'Courage is being scared to death, but saddling up anyway.',
           user:
             '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
-          parentId: 2,
-          start: this.getDate(-24 * 3),
+          start: this.getDate(-24 * 2),
           duration: 2 * 24 * 60 * 60 * 1000,
           progress: 100,
-          type: 'task'
+          type: 'task',
+          row: 1
         },
         {
           id: 4,
@@ -137,7 +143,8 @@ export default {
           duration: 2 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
-          dependentOn: [3]
+          dependentOn: [3],
+          row: 1
         }
       ];
     }

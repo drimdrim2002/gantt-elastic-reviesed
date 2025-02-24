@@ -844,7 +844,8 @@ const GanttElastic = {
      */
     getHeight(visibleTasks, outer = false) {
       let height =
-        visibleTasks.length * (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) +
+        (typeof visibleTasks === 'number' ? visibleTasks : visibleTasks.length) *
+          (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) +
         this.state.options.calendar.height +
         this.state.options.calendar.strokeWidth +
         this.state.options.calendar.gap;
@@ -1410,15 +1411,30 @@ const GanttElastic = {
     visibleTasks() {
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
       const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
-      this.state.options.rowsHeight = this.getTasksHeight(maxRows);
+
+      // Group tasks by row
+      const tasksByRow = {};
+      maxRows.forEach(task => {
+        if (!tasksByRow[task.row]) {
+          tasksByRow[task.row] = [];
+        }
+        tasksByRow[task.row].push(task);
+      });
+
+      // Calculate total number of rows
+      const totalRows = Object.keys(tasksByRow).length;
+      this.state.options.rowsHeight = this.getTaskHeight() * totalRows;
+
       let heightCompensation = 0;
       if (this.state.options.maxHeight && this.state.options.rowsHeight > this.state.options.maxHeight) {
         heightCompensation = this.state.options.rowsHeight - this.state.options.maxHeight;
         this.state.options.rowsHeight = this.state.options.maxHeight;
       }
-      this.state.options.height = this.getHeight(maxRows) - heightCompensation;
-      this.state.options.allVisibleTasksHeight = this.getTasksHeight(visibleTasks);
-      this.state.options.outerHeight = this.getHeight(maxRows, true) - heightCompensation;
+
+      this.state.options.height = this.getHeight(totalRows) - heightCompensation;
+      this.state.options.allVisibleTasksHeight = this.getTaskHeight() * Object.keys(tasksByRow).length;
+      this.state.options.outerHeight = this.getHeight(totalRows, true) - heightCompensation;
+
       let len = visibleTasks.length;
       for (let index = 0; index < len; index++) {
         let task = visibleTasks[index];
@@ -1430,7 +1446,7 @@ const GanttElastic = {
         task.height = this.state.options.row.height;
         task.x = this.timeToPixelOffsetX(task.startTime);
         task.y =
-          (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * index +
+          (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * task.row +
           this.state.options.chart.grid.horizontal.gap;
       }
       return visibleTasks;
@@ -1572,7 +1588,9 @@ const GanttElastic = {
    * Before destroy event - clean up
    */
   beforeDestroy() {
-    this.state.resizeObserver.unobserve(this.$el.parentNode);
+    if (this.state.resizeObserver && this.$el && this.$el.parentNode) {
+      this.state.resizeObserver.unobserve(this.$el.parentNode);
+    }
     this.state.unwatchTasks();
     this.state.unwatchOptions();
     this.state.unwatchStyle();
