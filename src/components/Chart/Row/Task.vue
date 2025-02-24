@@ -170,12 +170,8 @@ export default {
       event.preventDefault();
       event.stopPropagation();
 
-      if (!event.shiftKey) {
-        if (this.root.state.selectedTasks) {
-          this.root.state.selectedTasks = [];
-        }
-        this.root.state.selectedTasks = [this.task];
-        this.isSelected = true;
+      if (!this.isSelected) {
+        this.root.updateSelectedTasks([this.task]);
       }
 
       this.isDragging = true;
@@ -207,9 +203,7 @@ export default {
 
           // 새로운 위치 계산
           const newX = originalPosition.x + dx;
-          const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
-          const newRow = Math.floor((originalPosition.y + dy) / rowHeight);
-          const newY = newRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
+          const newY = originalPosition.y + dy;
 
           // task 위치 업데이트
           selectedTask.x = newX;
@@ -218,9 +212,6 @@ export default {
           // 시간 업데이트
           const newStartTime = this.root.pixelOffsetXToTime(newX);
           selectedTask.start = newStartTime;
-
-          // row 업데이트
-          selectedTask.row = Math.max(0, newRow);
         });
 
         this.emitEvent('taskDragging', { tasks: selectedTasks, event: e });
@@ -230,7 +221,7 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        // 선택된 모든 task의 최종 위치 조정
+        // 마우스를 놓았을 때 가장 가까운 row에 배치
         const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
 
         selectedTasks.forEach(selectedTask => {
