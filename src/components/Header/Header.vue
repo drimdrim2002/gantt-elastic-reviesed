@@ -50,7 +50,7 @@
             :process-style="{ ...style['header-slider--process'] }"
             :slider-style="{ ...style['header-slider--slider'] }"
             v-model="scale"
-            :max="10"
+            :max="3"
             :min="1"
             :step="0.5"
             width="100px"
@@ -92,7 +92,7 @@
             :process-style="{ ...style['header-slider--process'] }"
             :slider-style="{ ...style['header-slider--slider'] }"
             v-model="scope"
-            :max="31"
+            :max="2"
             :min="0"
             width="100px"
           ></vue-slider>
