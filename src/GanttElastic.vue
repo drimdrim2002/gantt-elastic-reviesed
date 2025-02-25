@@ -92,8 +92,8 @@ function getOptions(userOptions) {
     },
     scope: {
       //*
-      before: 1,
-      after: 1
+      before: 0,
+      after: 0
     },
     times: {
       timeScale: 60 * 1000,

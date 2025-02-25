@@ -84,7 +84,14 @@
       </label>
       <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
         {{ opts.locale['Before/After'] }}
-        <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
+        <div
+          class="gantt-elastic__header-slider-wrapper"
+          :style="{ ...style['header-slider-wrapper'] }"
+          @mouseover="showScopeTooltip = true"
+          @mouseleave="showScopeTooltip = false"
+          ref="scopeSliderWrapper"
+        >
+          <div v-if="showScopeTooltip" class="custom-tooltip" :style="scopeTooltipStyle">Expand: {{ scope }} days</div>
           <vue-slider
             class="gantt-elastic__header-slider"
             tooltip="none"
@@ -95,6 +102,7 @@
             :max="2"
             :min="0"
             width="100px"
+            @input="updateScopeTooltipPosition"
           ></vue-slider>
         </div>
       </label>
@@ -221,8 +229,10 @@ export default {
       localPercent: 0,
       showCustomTooltip: false,
       showYScaleTooltip: false,
+      showScopeTooltip: false,
       tooltipLeft: 0,
       yTooltipLeft: 0,
+      scopeTooltipLeft: 0,
       sliderOptions: {
         xScale: {
           value: 0
@@ -283,6 +293,13 @@ export default {
         const sliderWidth = this.$refs.ySliderWrapper.offsetWidth;
         const percent = (this.height - 7) / (100 - 7);
         this.yTooltipLeft = percent * sliderWidth;
+      }
+    },
+    updateScopeTooltipPosition() {
+      if (this.$refs.scopeSliderWrapper) {
+        const sliderWidth = this.$refs.scopeSliderWrapper.offsetWidth;
+        const percent = this.scope / 2; // max가 2이므로 2로 나눔
+        this.scopeTooltipLeft = percent * sliderWidth;
       }
     }
   },
@@ -362,6 +379,20 @@ export default {
       return {
         position: 'absolute',
         left: `${this.yTooltipLeft}px`,
+        top: '-25px',
+        backgroundColor: '#42b983',
+        color: 'white',
+        padding: '2px 6px',
+        borderRadius: '3px',
+        fontSize: '12px',
+        transform: 'translateX(-50%)',
+        zIndex: 1000
+      };
+    },
+    scopeTooltipStyle() {
+      return {
+        position: 'absolute',
+        left: `${this.scopeTooltipLeft}px`,
         top: '-25px',
         backgroundColor: '#42b983',
         color: 'white',
