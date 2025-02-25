@@ -431,13 +431,6 @@ export default {
   watch: {
     'root.state.selectedTasks': {
       handler(newSelectedTasks) {
-        // 디버깅 로그 추가
-        console.log('Watch triggered:', {
-          taskId: this.task.id,
-          newSelectedTasks: newSelectedTasks.map(t => t.id),
-          wasSelected: this.isSelected
-        });
-
         // 명시적으로 배열 확인 후 처리
         if (!Array.isArray(newSelectedTasks)) {
           this.isSelected = false;
@@ -446,8 +439,12 @@ export default {
 
         this.isSelected = newSelectedTasks.some(task => task.id === this.task.id);
 
-        // 상태 변경 확인
-        console.log(`Task ${this.task.id} selected state: ${this.isSelected}`);
+        // 선택 상태에 따라 시각적 효과 적용
+        if (this.isSelected) {
+          this.$el.classList.add('selected');
+        } else {
+          this.$el.classList.remove('selected');
+        }
       },
       deep: true,
       immediate: true

@@ -126,6 +126,9 @@ export default {
 
     // 클릭 시 SVG에 포커스 유지
     this.$el.addEventListener('click', this.focusSvg);
+
+    // ESC 키 전역 이벤트 리스너 추가
+    window.addEventListener('keydown', this.handleGlobalKeyDown);
   },
 
   computed: {
@@ -151,6 +154,32 @@ export default {
     },
     onTaskDragEnd(event) {
       this.root.$emit('task-moved', event.tasks || event.task);
+    },
+    /**
+     * 전역 키보드 이벤트 처리
+     */
+    handleGlobalKeyDown(event) {
+      // ESC 키 처리
+      if (event.key === 'Escape') {
+        console.log('ESC key pressed - clearing selections');
+        this.clearAllSelections();
+      }
+    },
+    /**
+     * 선택 상태 완전 초기화
+     */
+    clearAllSelections() {
+      console.log('Clearing all selections');
+      // 마지막 선택 task 초기화
+      this.lastSelectedTaskId = null;
+
+      // 선택된 모든 task 초기화
+      this.root.updateSelectedTasks([]);
+
+      // 모든 task의 선택 상태 시각적 표시 제거
+      document.querySelectorAll('.gantt-elastic__chart-row-task-wrapper.selected').forEach(el => {
+        el.classList.remove('selected');
+      });
     },
     /**
      * Task 선택 처리
@@ -203,10 +232,7 @@ export default {
               // 현재 작업과 마지막 작업이 같은 row에 있는지 확인
               if (lastTask.row !== task.row) {
                 alert('다른 row의 task는 선택할 수 없습니다. 같은 row의 task만 선택 가능합니다.');
-                // 마지막 선택 task 초기화
-                this.lastSelectedTaskId = null;
-                // 선택된 모든 task 초기화
-                updateSelection([]);
+                this.clearAllSelections();
                 return;
               }
 
@@ -263,10 +289,7 @@ export default {
             const selectedRow = currentSelection[0].row;
             if (task.row !== selectedRow) {
               alert('다른 row의 task는 선택할 수 없습니다. 같은 row의 task만 선택 가능합니다.');
-              // 마지막 선택 task 초기화
-              this.lastSelectedTaskId = null;
-              // 선택된 모든 task 초기화
-              updateSelection([]);
+              this.clearAllSelections();
               return;
             }
           }
@@ -336,10 +359,11 @@ export default {
     onKeyDown(event) {
       if (event.key === 'Shift') {
         this.shiftKeyPressed = true;
-        // console.log('Shift key pressed');
       } else if (event.key === 'Control' || event.key === 'Meta') {
         this.ctrlKeyPressed = true;
-        // console.log('Ctrl/Cmd key pressed');
+      } else if (event.key === 'Escape') {
+        // ESC 키를 누르면 모든 선택 해제
+        this.clearAllSelections();
       }
     },
     /**
@@ -348,10 +372,8 @@ export default {
     onKeyUp(event) {
       if (event.key === 'Shift') {
         this.shiftKeyPressed = false;
-        console.log('Shift key released');
       } else if (event.key === 'Control' || event.key === 'Meta') {
         this.ctrlKeyPressed = false;
-        console.log('Ctrl/Cmd key released');
       }
     },
     resetKeyState() {
@@ -371,6 +393,7 @@ export default {
     document.removeEventListener('keyup', this.onKeyUp);
     window.removeEventListener('blur', this.resetKeyState);
     this.$el.removeEventListener('click', this.focusSvg);
+    window.removeEventListener('keydown', this.handleGlobalKeyDown);
   }
 };
 </script>
