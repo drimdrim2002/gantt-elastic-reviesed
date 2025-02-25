@@ -38,11 +38,10 @@
         ...root.style['chart-row-task'],
         ...task.style['chart-row-bar'],
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isSelected ? '0.8' : '1',
-        outline: isSelected ? '2px solid #42b983' : 'none'
+        opacity: isSelected ? '0.8' : '1'
       }"
       :x="task.x"
-      :y="task.y"
+      :y="task.y + (root.state.options.row.height - 24) / 2"
       :width="24"
       :height="24"
       :viewBox="'0 0 24 24'"
@@ -69,7 +68,8 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-task-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          stroke: 'none'
         }"
         cx="12"
         cy="12"
@@ -394,11 +394,5 @@ export default {
 
 .gantt-elastic__chart-row-bar.selected {
   opacity: 0.8;
-  outline: 2px solid #42b983;
-}
-
-.selected {
-  stroke: #42b983;
-  stroke-width: 2px;
 }
 </style>

@@ -15,18 +15,18 @@
     class="gantt-elastic__chart-dependency-lines-container"
     :style="{ ...root.style['chart-dependency-lines-container'] }"
   >
-    <g v-for="task in dependencyTasks" :key="task.id" :task="task">
+    <g v-for="line in dependencyLines" :key="line.id">
       <path
         class="gantt-elastic__chart-dependency-lines-path"
         :style="{
-          ...root.style['chart-dependency-lines-path'],
-          ...task.style['chart-dependency-lines-path'],
-          ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id]
+          stroke: getLineColor(line.fromTask),
+          strokeWidth: '1.5px',
+          strokeOpacity: '0.7',
+          fill: 'none',
+          strokeDasharray: 'none',
+          pointerEvents: 'none'
         }"
-        v-for="dependencyLine in task.dependencyLines"
-        :key="dependencyLine.id"
-        :task="task"
-        :d="dependencyLine.points"
+        :d="line.path"
       ></path>
     </g>
   </svg>
@@ -41,6 +41,19 @@ export default {
     return {};
   },
   methods: {
+    /**
+     * Get line color from task style
+     * @param {Object} task
+     * @returns {string}
+     */
+    getLineColor(task) {
+      // task의 스타일에서 색상 가져오기
+      if (task && task.style && task.style.base) {
+        return task.style.base.fill || '#42b983'; // 기본 색상은 task의 기본 색상과 동일
+      }
+      // task에서 색상을 찾을 수 없는 경우 기본 색상 반환
+      return '#42b983';
+    },
     /**
      * Get path points
      *
@@ -107,17 +120,63 @@ export default {
      *
      * @returns {array}
      */
-    dependencyTasks() {
-      return this.tasks
-        .filter(task => typeof task.dependentOn !== 'undefined')
-        .map(task => {
-          task.dependencyLines = task.dependentOn.map(id => {
-            return { points: this.getPoints(id, task.id), task_id: id };
+    dependencyLines() {
+      const lines = [];
+      this.root.visibleTasks.forEach(task => {
+        if (task.dependentOn && task.dependentOn.length > 0) {
+          task.dependentOn.forEach(dependentId => {
+            const dependentTask = this.root.visibleTasks.find(t => t.id === dependentId);
+            if (dependentTask) {
+              // 시작점 (의존하는 task의 오른쪽 중앙)
+              const startX = dependentTask.x + 24; // task width가 24
+              const startY = dependentTask.y + this.root.state.options.row.height / 2; // row의 중앙
+
+              // 끝점 (현재 task의 왼쪽 중앙)
+              const endX = task.x;
+              const endY = task.y + this.root.state.options.row.height / 2; // row의 중앙
+
+              // 곡선 제어점
+              const controlPoint1X = startX + Math.min((endX - startX) * 0.5, 50);
+              const controlPoint1Y = startY;
+              const controlPoint2X = endX - Math.min((endX - startX) * 0.5, 50);
+              const controlPoint2Y = endY;
+
+              // 베지어 곡선 경로 생성
+              const path = `M ${startX} ${startY} 
+                          C ${controlPoint1X} ${controlPoint1Y},
+                            ${controlPoint2X} ${controlPoint2Y},
+                            ${endX} ${endY}`;
+
+              lines.push({
+                id: `${dependentTask.id}-${task.id}`,
+                path: path,
+                fromTask: dependentTask,
+                toTask: task
+              });
+            }
           });
-          return task;
-        })
-        .filter(task => task.dependencyLines.points !== null);
+        }
+      });
+      return lines;
     }
   }
 };
 </script>
+
+<style scoped>
+.gantt-elastic__chart-dependency-lines-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gantt-elastic__chart-dependency-lines-path {
+  transition: stroke-width 0.2s;
+}
+
+.gantt-elastic__chart-dependency-lines-path:hover {
+  stroke-width: 3px;
+}
+</style>

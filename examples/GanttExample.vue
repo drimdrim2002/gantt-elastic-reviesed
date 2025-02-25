@@ -107,7 +107,12 @@ export default {
           duration: 0.1 * 24 * 60 * 60 * 1000,
           progress: 85,
           type: 'task',
-          row: 0
+          row: 0,
+          style: {
+            base: {
+              fill: '#42b983' // 초록색 (row 0)
+            }
+          }
         },
         {
           id: 2,
@@ -119,7 +124,12 @@ export default {
           progress: 50,
           type: 'task',
           row: 0,
-          dependentOn: [1]
+          dependentOn: [1],
+          style: {
+            base: {
+              fill: '#42b983' // 초록색 (row 0)
+            }
+          }
         },
         {
           id: 3,
@@ -130,7 +140,12 @@ export default {
           duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
-          row: 1
+          row: 1,
+          style: {
+            base: {
+              fill: '#FF0000' // 빨간색 (row 1)
+            }
+          }
         },
         {
           id: 4,
@@ -142,7 +157,12 @@ export default {
           progress: 50,
           type: 'task',
           dependentOn: [3],
-          row: 1
+          row: 1,
+          style: {
+            base: {
+              fill: '#FF0000' // 빨간색 (row 1)
+            }
+          }
         },
         {
           id: 5,
@@ -153,7 +173,12 @@ export default {
           duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
-          row: 2
+          row: 2,
+          style: {
+            base: {
+              fill: '#0000FF' // 파란색 (row 2)
+            }
+          }
         },
         {
           id: 6,
@@ -165,7 +190,12 @@ export default {
           progress: 50,
           type: 'task',
           row: 2,
-          dependentOn: [5]
+          dependentOn: [5],
+          style: {
+            base: {
+              fill: '#0000FF' // 파란색 (row 2)
+            }
+          }
         },
         {
           id: 7,
@@ -177,7 +207,12 @@ export default {
           progress: 50,
           type: 'task',
           row: 2,
-          dependentOn: [6]
+          dependentOn: [6],
+          style: {
+            base: {
+              fill: '#0000FF' // 파란색 (row 2)
+            }
+          }
         }
       ];
     },
