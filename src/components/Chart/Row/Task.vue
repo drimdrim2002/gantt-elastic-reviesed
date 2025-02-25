@@ -164,6 +164,12 @@ export default {
         top: `${this.tooltipY}px`,
         zIndex: 9999
       };
+    },
+    /**
+     * Get tooltip style
+     */
+    displayExpander() {
+      return this.task.type === 'project' || (this.task.children && this.task.children.length > 0);
     }
   },
   methods: {
@@ -181,25 +187,9 @@ export default {
       const taskWidth = 24;
       const tooltipOffset = 10;
       this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
-      this.tooltipY = Number(this.task.y) - tooltipHeight - tooltipOffset;
+      this.tooltipY = Number(this.task.y) - tooltipHeight / 2;
 
       this.showingTooltip = true;
-
-      // gap을 포함한 실제 row 높이 계산
-      const rowHeight =
-        this.root.state.options.row.height +
-        (this.root.state.options.calendar.gap || 0) +
-        (this.root.state.options.chart.grid.horizontal.gap || 0);
-
-      console.log(this.task.y - this.root.state.options.calendar.gap);
-      console.log(rowHeight);
-
-      // 현재 row index 계산
-      const currentRow = Math.floor((this.task.y - this.root.state.options.calendar.gap) / rowHeight);
-
-      console.log(
-        `task y: ${this.task.y}, row height: ${this.root.state.options.row.height}, Current row index: ${currentRow}`
-      );
     },
 
     /**
@@ -233,46 +223,15 @@ export default {
 
     onTaskClick(event) {
       // 먼저 이벤트 전달
-      this.emitEvent('click', event);
+      // this.emitEvent('click', event); // 중복 이벤트 발생 방지를 위해 제거
 
-      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
-      event.stopPropagation(); // 이벤트 버블링만 중단
-      // preventDefault는 필요하지 않음 (클릭 동작 자체는 필요)
+      // 이벤트 버블링 중단
+      event.stopPropagation();
 
-      if (event.shiftKey) {
-        const selectedTasks = this.root.state.selectedTasks || [];
-        // if (selectedTasks.length > 0 && !selectedTasks.every(t => t.row === this.task.row)) {
-        //   alert('다른 row의 task는 선택할 수 없습니다.');
-        //   return;
-        // }
-
-        // Shift 키를 누른 상태에서는 기존 선택에 추가/제거
-        const isCurrentlySelected = selectedTasks.some(t => t.id === this.task.id);
-        if (isCurrentlySelected) {
-          // 이미 선택된 task라면 제거
-          this.root.updateSelectedTasks(selectedTasks.filter(t => t.id !== this.task.id));
-        } else {
-          // 선택되지 않은 task라면 추가
-          this.root.updateSelectedTasks([...selectedTasks, this.task]);
-        }
-      } else {
-        // 일반 클릭 시에는 토글 동작
-        const selectedTasks = this.root.state.selectedTasks || [];
-        const isCurrentlySelected = selectedTasks.some(t => t.id === this.task.id);
-
-        if (isCurrentlySelected) {
-          // 이미 선택된 task라면 선택 해제
-          this.root.updateSelectedTasks([]);
-        } else {
-          // 선택되지 않은 task라면 선택
-          this.root.updateSelectedTasks([this.task]);
-        }
-      }
-
-      // 클릭 이벤트 발생 후 task-selected 이벤트도 발생
-      this.$emit('task-selected', {
-        selectedTasks: this.root.state.selectedTasks,
-        count: this.root.state.selectedTasks.length
+      // 올바른 이벤트 이름으로 변경
+      this.$emit('chart-task-click', {
+        task: this.task,
+        event: event
       });
     },
 
@@ -472,7 +431,23 @@ export default {
   watch: {
     'root.state.selectedTasks': {
       handler(newSelectedTasks) {
+        // 디버깅 로그 추가
+        console.log('Watch triggered:', {
+          taskId: this.task.id,
+          newSelectedTasks: newSelectedTasks.map(t => t.id),
+          wasSelected: this.isSelected
+        });
+
+        // 명시적으로 배열 확인 후 처리
+        if (!Array.isArray(newSelectedTasks)) {
+          this.isSelected = false;
+          return;
+        }
+
         this.isSelected = newSelectedTasks.some(task => task.id === this.task.id);
+
+        // 상태 변경 확인
+        console.log(`Task ${this.task.id} selected state: ${this.isSelected}`);
       },
       deep: true,
       immediate: true
@@ -516,5 +491,10 @@ export default {
 
 .gantt-elastic__chart-row-bar.selected {
   opacity: 0.8;
+}
+
+/* 선택된 작업 스타일 */
+.gantt-elastic__chart-row-task-wrapper.selected .gantt-elastic__chart-row-task {
+  filter: brightness(1.1);
 }
 </style>
