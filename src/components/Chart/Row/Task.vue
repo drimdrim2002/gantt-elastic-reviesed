@@ -14,7 +14,7 @@
       ...root.style['chart-row-task-wrapper'],
       ...task.style['chart-row-bar-wrapper']
     }"
-    :class="{ selected: isSelected, 'task-animated': isSelected }"
+    :class="{ selected: isSelected }"
   >
     <foreignObject
       class="gantt-elastic__chart-expander gantt-elastic__chart-expander--task"
@@ -38,7 +38,7 @@
         ...root.style['chart-row-task'],
         ...task.style['chart-row-bar'],
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isSelected ? '0.8' : '1'
+        opacity: '1'
       }"
       :x="task.x"
       :y="task.y + (root.state.options.row.height - 24) / 2"
@@ -90,6 +90,18 @@
       >
         {{ task.label }}
       </text>
+      <!-- 선택 표시 원 -->
+      <circle
+        v-if="isSelected"
+        cx="12"
+        cy="12"
+        r="14"
+        fill="none"
+        :stroke="task.style.base.fill || '#42b983'"
+        stroke-width="2.5"
+        stroke-dasharray="3,3"
+        stroke-opacity="1"
+      />
     </svg>
     <!-- SVG foreignObject 기반 툴팁 -->
     <foreignObject v-if="showingTooltip" :x="tooltipX" :y="tooltipY" width="200" height="100" class="task-tooltip">
