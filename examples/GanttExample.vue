@@ -31,6 +31,10 @@ export default {
             after: 0
           }
         },
+        scope: {
+          before: 0,
+          after: 0
+        },
         title: {
           label: 'Your project title as html (link or whatever...)',
           html: false
