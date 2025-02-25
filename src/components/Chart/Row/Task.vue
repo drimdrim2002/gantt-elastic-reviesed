@@ -14,7 +14,7 @@
       ...root.style['chart-row-task-wrapper'],
       ...task.style['chart-row-bar-wrapper']
     }"
-    :class="{ selected: isSelected }"
+    :class="{ selected: isSelected, 'task-animated': isSelected }"
   >
     <foreignObject
       class="gantt-elastic__chart-expander gantt-elastic__chart-expander--task"
@@ -48,8 +48,6 @@
       @click="onTaskClick"
       @mouseenter="showTooltip"
       @mouseleave="hideTooltip"
-      @mouseover="emitEvent('mouseover', $event)"
-      @mouseout="emitEvent('mouseout', $event)"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
@@ -124,6 +122,8 @@ export default {
   data() {
     return {
       isDragging: false,
+      hasMoved: false,
+      minDragDistance: 5,
       dragStartX: 0,
       dragStartY: 0,
       originalPositions: [],
@@ -264,6 +264,9 @@ export default {
       });
     },
 
+    /**
+     * Task 드래그 시작
+     */
     onDragStart(event) {
       // 먼저 이벤트 전달
       this.emitEvent('dragstart', event);
@@ -277,11 +280,20 @@ export default {
       }
 
       this.isDragging = true;
+      this.hasMoved = false;
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
 
       // 선택된 tasks를 상위 스코프에서 정의
       const selectedTasks = this.root.state.selectedTasks || [];
+
+      // 원래 위치 저장
+      this.originalPositions = selectedTasks.map(task => ({
+        id: task.id,
+        x: task.x,
+        y: task.y,
+        start: task.start
+      }));
 
       const onMouseMove = e => {
         if (!this.isDragging) return;
@@ -291,6 +303,11 @@ export default {
 
         const dx = e.clientX - this.dragStartX;
         const dy = e.clientY - this.dragStartY;
+
+        // 최소 드래그 거리를 넘었는지 확인
+        if (!this.hasMoved && (Math.abs(dx) > this.minDragDistance || Math.abs(dy) > this.minDragDistance)) {
+          this.hasMoved = true;
+        }
 
         // 디버깅용: 첫 번째 task의 정보를 콘솔에 출력
         if (selectedTasks.length > 0) {
@@ -324,6 +341,29 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
+        // 드래그 상태 해제
+        this.isDragging = false;
+
+        // 실제 드래그 이동이 없었으면 원래 위치로 복원하고 종료
+        if (!this.hasMoved) {
+          // 원래 위치로 복원
+          this.originalPositions.forEach(original => {
+            const task = selectedTasks.find(t => t.id === original.id);
+            if (task) {
+              task.x = original.x;
+              task.y = original.y;
+              task.start = original.start;
+            }
+          });
+
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+
+          // 클릭 이벤트 발생 (드래그가 아닌 클릭으로 처리)
+          this.onTaskClick(e);
+          return;
+        }
+
         // 마우스를 놓았을 때 가장 가까운 row에 배치
         const rowHeight =
           this.root.state.options.row.height +
@@ -333,18 +373,33 @@ export default {
         // 디버깅용: rowHeight 구성요소 출력
         console.log('Row 높이 계산:', {
           'row.height': this.root.state.options.row.height,
-          'calendar.gap': this.root.state.options.calendar.gap,
-          'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap,
-          'total rowHeight': rowHeight
+          'calendar.gap': this.root.state.options.calendar.gap || 0,
+          'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap || 0,
+          total: rowHeight
         });
 
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
           console.log(`task 배치 전: y=${selectedTask.y}, height=${selectedTask.height}`);
-          const finalRow = Math.floor((selectedTask.y - this.root.state.options.calendar.gap) / rowHeight);
-          selectedTask.y = finalRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
-          selectedTask.row = Math.max(0, finalRow);
-          console.log(`task 배치 후: y=${selectedTask.y}, height=${selectedTask.height}, row=${selectedTask.row}`);
+
+          // 현재 y 위치에 해당하는 row 계산 (반올림)
+          const rowIndex = Math.round(selectedTask.y / rowHeight);
+
+          // row의 시작 y 좌표 계산
+          const rowStartY = rowIndex * rowHeight;
+
+          // task의 높이 (SVG 높이)
+          const taskHeight = 24; // SVG 높이
+
+          // row의 중앙에 task 배치
+          // row 시작 위치 + (row 높이 - task 높이) / 2
+          const centerY = rowStartY + (this.root.state.options.row.height - taskHeight) / 2;
+
+          // task 위치 업데이트
+          selectedTask.y = centerY;
+          selectedTask.row = rowIndex;
+
+          console.log(`task 배치 후: y=${selectedTask.y}, row=${selectedTask.row}`);
         });
 
         // 드래그 완료 위치 정보 계산 (첫 번째 선택된 task 기준)
@@ -392,7 +447,6 @@ export default {
           }
         });
 
-        this.isDragging = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 

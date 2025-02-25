@@ -69,14 +69,8 @@ export default {
       const endX = toTask.x;
       const endY = toTask.y + this.root.state.options.row.height / 2; // row의 중앙
 
-      // 중간 지점 계산
-      const midX = startX + (endX - startX) / 2;
-
-      // 단순한 꺾인 선 경로 생성 (ㄱ자 형태)
-      const path = `M ${startX} ${startY} 
-                   L ${midX} ${startY} 
-                   L ${midX} ${endY} 
-                   L ${endX} ${endY}`;
+      // 직선 경로 생성
+      const path = `M ${startX} ${startY} L ${endX} ${endY}`;
 
       return path;
     }
@@ -126,6 +120,7 @@ export default {
   fill: none;
   stroke: #42b983;
   stroke-width: 2px;
+  stroke-linecap: round; /* 선의 끝을 둥글게 처리 */
 }
 
 .gantt-elastic__chart-dependency-lines-path:hover {
