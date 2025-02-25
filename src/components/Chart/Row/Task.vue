@@ -171,12 +171,13 @@ export default {
       const rowHeight =
         this.root.state.options.row.height +
         (this.root.state.options.calendar.gap || 0) +
-        (this.root.state.options.chart.grid.horizontal.gap || 0) * 2;
+        (this.root.state.options.chart.grid.horizontal.gap || 0);
+
+      console.log(this.task.y - this.root.state.options.calendar.gap);
+      console.log(rowHeight);
 
       // 현재 row index 계산
-      const currentRow = Math.floor(
-        (this.task.y - this.root.state.options.calendar.gap) / this.root.state.options.row.height
-      );
+      const currentRow = Math.floor((this.task.y - this.root.state.options.calendar.gap) / rowHeight);
 
       console.log(
         `task y: ${this.task.y}, row height: ${this.root.state.options.row.height}, Current row index: ${currentRow}`
