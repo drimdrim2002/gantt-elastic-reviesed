@@ -51,7 +51,7 @@
             :slider-style="{ ...style['header-slider--slider'] }"
             v-model="scale"
             :max="3"
-            :min="1"
+            :min="0"
             :step="0.5"
             width="100px"
             @input="updateTooltipPosition"
