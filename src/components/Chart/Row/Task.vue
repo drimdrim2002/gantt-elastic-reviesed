@@ -159,6 +159,12 @@ export default {
      * Show tooltip
      */
     showTooltip(event) {
+      // 먼저 이벤트 전달
+      this.emitEvent('mouseenter', event);
+
+      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
+      event.stopPropagation();
+
       const tooltipHeight = 100;
       const taskWidth = 24;
       const tooltipOffset = 10;
@@ -182,16 +188,19 @@ export default {
       console.log(
         `task y: ${this.task.y}, row height: ${this.root.state.options.row.height}, Current row index: ${currentRow}`
       );
-
-      this.emitEvent('mouseenter', event);
     },
 
     /**
      * Hide tooltip
      */
     hideTooltip(event) {
-      this.showingTooltip = false;
+      // 먼저 이벤트 전달
       this.emitEvent('mouseleave', event);
+
+      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
+      event.stopPropagation();
+
+      this.showingTooltip = false;
     },
 
     /**
@@ -211,7 +220,12 @@ export default {
     },
 
     onTaskClick(event) {
+      // 먼저 이벤트 전달
+      this.emitEvent('click', event);
+
+      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
       event.stopPropagation(); // 이벤트 버블링만 중단
+      // preventDefault는 필요하지 않음 (클릭 동작 자체는 필요)
 
       if (event.shiftKey) {
         const selectedTasks = this.root.state.selectedTasks || [];
@@ -248,11 +262,13 @@ export default {
         selectedTasks: this.root.state.selectedTasks,
         count: this.root.state.selectedTasks.length
       });
-
-      this.emitEvent('click', event);
     },
 
     onDragStart(event) {
+      // 먼저 이벤트 전달
+      this.emitEvent('dragstart', event);
+      this.emitEvent('mousedown', event);
+
       event.preventDefault();
       event.stopPropagation();
 
@@ -275,6 +291,12 @@ export default {
 
         const dx = e.clientX - this.dragStartX;
         const dy = e.clientY - this.dragStartY;
+
+        // 디버깅용: 첫 번째 task의 정보를 콘솔에 출력
+        if (selectedTasks.length > 0) {
+          const firstTask = selectedTasks[0];
+          console.log(`드래그 중: task.y=${firstTask.y}, task.height=${firstTask.height}, row=${firstTask.row}`);
+        }
 
         // 선택된 모든 task 이동
         selectedTasks.forEach(selectedTask => {
@@ -303,14 +325,42 @@ export default {
         e.stopPropagation();
 
         // 마우스를 놓았을 때 가장 가까운 row에 배치
-        const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
+        const rowHeight =
+          this.root.state.options.row.height +
+          (this.root.state.options.calendar.gap || 0) +
+          (this.root.state.options.chart.grid.horizontal.gap || 0);
+
+        // 디버깅용: rowHeight 구성요소 출력
+        console.log('Row 높이 계산:', {
+          'row.height': this.root.state.options.row.height,
+          'calendar.gap': this.root.state.options.calendar.gap,
+          'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap,
+          'total rowHeight': rowHeight
+        });
 
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
-          const finalRow = Math.floor(selectedTask.y / rowHeight);
+          console.log(`task 배치 전: y=${selectedTask.y}, height=${selectedTask.height}`);
+          const finalRow = Math.floor((selectedTask.y - this.root.state.options.calendar.gap) / rowHeight);
           selectedTask.y = finalRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
           selectedTask.row = Math.max(0, finalRow);
+          console.log(`task 배치 후: y=${selectedTask.y}, height=${selectedTask.height}, row=${selectedTask.row}`);
         });
+
+        // 드래그 완료 위치 정보 계산 (첫 번째 선택된 task 기준)
+        if (selectedTasks.length > 0) {
+          const firstTask = selectedTasks[0];
+
+          // 1. 시간 계산
+          const dropTime = new Date(firstTask.start);
+          const formattedTime = dropTime.toLocaleTimeString();
+
+          // 2. Row 계산
+          const dropRow = firstTask.row;
+
+          // 3. Alert 메시지 표시
+          alert(`Task를 다음 위치로 이동했습니다:\n시간: ${formattedTime}\nRow: ${dropRow}`);
+        }
 
         // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
         const rowTasks = {};
@@ -351,20 +401,6 @@ export default {
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
-
-      this.emitEvent('mousedown', event);
-    },
-
-    onDragEnd(event) {
-      event.preventDefault();
-      if (!this.isDragging) return;
-
-      this.isDragging = false;
-
-      document.removeEventListener('mousemove', this.onDragging);
-      document.removeEventListener('mouseup', this.onDragEnd);
-
-      this.emitEvent('taskDragEnd', { task: this.task, event });
     }
   },
   watch: {
