@@ -135,7 +135,7 @@ export default {
     return {
       isDragging: false,
       hasMoved: false,
-      minDragDistance: 5,
+      minDragDistance: 1,
       dragStartX: 0,
       dragStartY: 0,
       originalPositions: [],
@@ -316,6 +316,15 @@ export default {
         // 드래그 상태 해제
         this.isDragging = false;
 
+        // row 0: 0 ~20
+        // row 1: 20 ~60
+        // row 2: 60 ~100
+        // row 3: 100 ~140
+        // row 4: 140 ~180
+        // row 5: 180 ~220
+        // row 6: 220 ~260
+        // row 7: 260 ~300
+        // row 8: 300 ~340
         // 실제 드래그 이동이 없었으면 원래 위치로 복원하고 종료
         if (!this.hasMoved) {
           // 원래 위치로 복원
@@ -350,12 +359,33 @@ export default {
           total: rowHeight
         });
 
+        const maxRows = 100;
+
+        const boundaries = [];
+        for (let i = 0; i < maxRows; i++) {
+          const minY = i * rowHeight - rowHeight / 2;
+          const maxY = i * rowHeight + rowHeight / 2;
+          boundaries.push({
+            row: i,
+            min: minY,
+            max: maxY
+          });
+        }
+
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
           console.log(`task 배치 전: y=${selectedTask.y}, height=${selectedTask.height}`);
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
-          const rowIndex = Math.round(selectedTask.y / rowHeight);
+          let rowIndex = Math.round(selectedTask.y / rowHeight);
+
+          for (let boundary of boundaries) {
+            console.log('boundary', boundary);
+            if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
+              rowIndex = boundary.row;
+              break;
+            }
+          }
 
           // row의 시작 y 좌표 계산
           const rowStartY = rowIndex * rowHeight;
