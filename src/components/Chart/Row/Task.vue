@@ -440,11 +440,16 @@ export default {
         this.isSelected = newSelectedTasks.some(task => task.id === this.task.id);
 
         // 선택 상태에 따라 시각적 효과 적용
-        if (this.isSelected) {
-          this.$el.classList.add('selected');
-        } else {
-          this.$el.classList.remove('selected');
-        }
+        // DOM 요소가 마운트된 후에만 classList 접근
+        this.$nextTick(() => {
+          if (this.$el) {
+            if (this.isSelected) {
+              this.$el.classList.add('selected');
+            } else {
+              this.$el.classList.remove('selected');
+            }
+          }
+        });
       },
       deep: true,
       immediate: true
