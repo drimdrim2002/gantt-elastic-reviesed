@@ -1409,6 +1409,30 @@ const GanttElastic = {
         selectedTasks,
         count: selectedTasks.length
       });
+    },
+
+    mouseWheel(ev) {
+      if (this.state.options.scroll.bodyIsScrolling) {
+        return;
+      }
+      ev.preventDefault();
+
+      // 현재 timeZoom 값
+      let timeZoom = this.state.options.times.timeZoom;
+
+      // ctrl 키를 누른 상태에서 마우스 휠을 사용하면 zoom 조절
+      if (ev.ctrlKey) {
+        const delta = ev.deltaY > 0 ? -1 : 1;
+
+        // 새 zoom 레벨 계산 (1~10 범위로 제한)
+        const newZoom = Math.min(Math.max(timeZoom + delta * 0.5, 1), 10);
+
+        this.state.options.times.timeZoom = newZoom;
+
+        this.$emit('times-timeZoom-updated', this.state.options.times.timeZoom);
+      } else {
+        // 일반 스크롤 처리...
+      }
     }
   },
 
@@ -1576,6 +1600,9 @@ const GanttElastic = {
     this.$root.$emit('gantt-elastic-mounted', this);
     this.$emit('mounted', this);
     this.$root.$emit('gantt-elastic-ready', this);
+
+    // zoom 레벨 초기값 범위 체크 (1~10)
+    this.state.options.times.timeZoom = Math.min(Math.max(this.state.options.times.timeZoom, 1), 10);
   },
 
   /**
