@@ -100,86 +100,84 @@ export default {
       return [
         {
           id: 1,
-          label: 'Make some noise',
+          label: '1',
           user:
             '<a href="https://www.google.com/search?q=John+Doe" target="_blank" style="color:#0077c0;">John Doe</a>',
           start: this.getDate(-24 * 5),
-          duration: 2 * 24 * 60 * 60 * 1000,
+          duration: 0.5 * 24 * 60 * 60 * 1000,
           progress: 85,
           type: 'task',
           row: 0
         },
         {
           id: 2,
-          label: 'With great power comes great responsibility',
+          label: '2',
           user:
             '<a href="https://www.google.com/search?q=Peter+Parker" target="_blank" style="color:#0077c0;">Peter Parker</a>',
           start: this.getDate(-24 * 3),
-          duration: 1 * 24 * 60 * 60 * 1000,
+          duration: 0.5 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
           row: 0,
-          style: {
-            base: {
-              fill: '#1EBC61',
-              stroke: '#0EAC51'
-            }
-          }
+          dependentOn: [1]
         },
         {
           id: 3,
-          label: 'Courage is being scared to death, but saddling up anyway.',
+          label: '3',
           user:
             '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
           start: this.getDate(-24 * 2),
-          duration: 2 * 24 * 60 * 60 * 1000,
+          duration: 0.4 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
           row: 1
         },
         {
           id: 4,
-          label: 'Put that toy AWAY!',
+          label: '4',
           user:
             '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
-          start: this.getDate(-24 * 2),
-          duration: 2 * 24 * 60 * 60 * 1000,
+          start: this.getDate(-24 * 1),
+          duration: 0.3 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
+          dependentOn: [3],
           row: 1
         },
         {
           id: 5,
-          label: 'Courage is being scared to death, but saddling up anyway.',
+          label: '5',
           user:
             '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
-          start: this.getDate(-24 * 1),
-          duration: 0.5 * 24 * 60 * 60 * 1000,
+          start: this.getDate(-24 * 2),
+          duration: 0.3 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
           row: 2
         },
         {
           id: 6,
-          label: 'Put that toy AWAY!',
-          user:
-            '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
-          start: this.getDate(-24 * 2),
-          duration: 0.5 * 24 * 60 * 60 * 1000,
-          progress: 50,
-          type: 'task',
-          row: 2
-        },
-        {
-          id: 7,
-          label: 'Put that toy AWAY!',
+          label: '6',
           user:
             '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
           start: this.getDate(-24 * 1.5),
+          duration: 0.2 * 24 * 60 * 60 * 1000,
+          progress: 50,
+          type: 'task',
+          row: 2,
+          dependentOn: [5]
+        },
+        {
+          id: 7,
+          label: '7',
+          user:
+            '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
+          start: this.getDate(-24 * 1),
           duration: 0.3 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
-          row: 2
+          row: 2,
+          dependentOn: [6]
         }
       ];
     },

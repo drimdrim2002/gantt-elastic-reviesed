@@ -129,10 +129,10 @@ export default {
 
       if (event.shiftKey) {
         const selectedTasks = this.root.state.selectedTasks || [];
-        if (selectedTasks.length > 0 && !selectedTasks.every(t => t.row === this.task.row)) {
-          alert('다른 row의 task는 선택할 수 없습니다.');
-          return;
-        }
+        // if (selectedTasks.length > 0 && !selectedTasks.every(t => t.row === this.task.row)) {
+        //   alert('다른 row의 task는 선택할 수 없습니다.');
+        //   return;
+        // }
 
         // Shift 키를 누른 상태에서는 기존 선택에 추가/제거
         const isCurrentlySelected = selectedTasks.some(t => t.id === this.task.id);
@@ -178,13 +178,8 @@ export default {
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
 
-      // 선택된 모든 task의 원래 위치를 저장
+      // 선택된 tasks를 상위 스코프에서 정의
       const selectedTasks = this.root.state.selectedTasks || [];
-      const initialPositions = selectedTasks.map(task => ({
-        id: task.id,
-        x: task.x,
-        y: task.y
-      }));
 
       const onMouseMove = e => {
         if (!this.isDragging) return;
@@ -197,13 +192,9 @@ export default {
 
         // 선택된 모든 task 이동
         selectedTasks.forEach(selectedTask => {
-          // 저장된 원래 위치 찾기
-          const originalPosition = initialPositions.find(pos => pos.id === selectedTask.id);
-          if (!originalPosition) return;
-
           // 새로운 위치 계산
-          const newX = originalPosition.x + dx;
-          const newY = originalPosition.y + dy;
+          const newX = selectedTask.x + dx;
+          const newY = selectedTask.y + dy;
 
           // task 위치 업데이트
           selectedTask.x = newX;
@@ -213,6 +204,10 @@ export default {
           const newStartTime = this.root.pixelOffsetXToTime(newX);
           selectedTask.start = newStartTime;
         });
+
+        // 드래그 시작점 업데이트
+        this.dragStartX = e.clientX;
+        this.dragStartY = e.clientY;
 
         this.emitEvent('taskDragging', { tasks: selectedTasks, event: e });
       };
@@ -224,10 +219,41 @@ export default {
         // 마우스를 놓았을 때 가장 가까운 row에 배치
         const rowHeight = this.root.state.options.row.height + this.root.state.options.chart.grid.horizontal.gap * 2;
 
+        // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
           const finalRow = Math.floor(selectedTask.y / rowHeight);
           selectedTask.y = finalRow * rowHeight + rowHeight / 2 - selectedTask.height / 2;
           selectedTask.row = Math.max(0, finalRow);
+        });
+
+        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
+        const rowTasks = {};
+
+        // 현재 row의 모든 task 수집
+        this.root.visibleTasks.forEach(task => {
+          if (!rowTasks[task.row]) {
+            rowTasks[task.row] = [];
+          }
+          rowTasks[task.row].push(task);
+        });
+
+        // 각 row의 task들을 x 좌표로 정렬
+        Object.keys(rowTasks).forEach(row => {
+          const tasks = rowTasks[row];
+          tasks.sort((a, b) => a.x - b.x);
+
+          // 겹침 방지
+          for (let i = 1; i < tasks.length; i++) {
+            const prevTask = tasks[i - 1];
+            const currentTask = tasks[i];
+            const minGap = 10; // 최소 간격 (픽셀)
+
+            if (currentTask.x < prevTask.x + prevTask.width + minGap) {
+              currentTask.x = prevTask.x + prevTask.width + minGap;
+              // 시간 정보도 업데이트
+              currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
+            }
+          }
         });
 
         this.isDragging = false;
