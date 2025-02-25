@@ -73,8 +73,22 @@
         :points="getPoints"
       ></polygon>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
+      <text
+        :x="task.width / 2"
+        :y="task.height / 2"
+        text-anchor="middle"
+        alignment-baseline="middle"
+        :style="{
+          fill: '#ffffff',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          userSelect: 'none',
+          pointerEvents: 'none'
+        }"
+      >
+        {{ task.label }}
+      </text>
     </svg>
-    <chart-text :task="task" v-if="root.state.options.chart.text.display"></chart-text>
   </g>
 </template>
 
