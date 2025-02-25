@@ -24,6 +24,9 @@ export default {
       tasks: this.getTasks(),
       selectedTasksCount: 0,
       options: {
+        times: {
+          timeZoom: 5
+        },
         title: {
           label: 'Your project title as html (link or whatever...)',
           html: false
