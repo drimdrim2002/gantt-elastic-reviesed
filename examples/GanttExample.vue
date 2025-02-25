@@ -10,7 +10,7 @@
 
 <script>
 import GanttElastic from '../src/GanttElastic.vue';
-import Header from 'gantt-elastic-header';
+import Header from '../src/components/Header/Header.vue';
 import dayjs from 'dayjs';
 
 export default {
