@@ -15,18 +15,17 @@
     class="gantt-elastic__chart-dependency-lines-container"
     :style="{ ...root.style['chart-dependency-lines-container'] }"
   >
-    <g v-for="line in dependencyLines" :key="line.id">
+    <g class="gantt-elastic__chart-dependency-lines">
       <path
+        v-for="line in dependencyLines"
+        :key="line.id"
+        :d="line.path"
         class="gantt-elastic__chart-dependency-lines-path"
         :style="{
-          stroke: getLineColor(line.fromTask),
-          strokeWidth: '1.5px',
-          strokeOpacity: '0.7',
-          fill: 'none',
-          strokeDasharray: 'none',
-          pointerEvents: 'none'
+          stroke: getLineColor(line.toTask),
+          strokeWidth: '2px',
+          fill: 'none'
         }"
-        :d="line.path"
       ></path>
     </g>
   </svg>
@@ -42,7 +41,7 @@ export default {
   },
   methods: {
     /**
-     * Get line color from task style
+     * Get line color from task
      * @param {Object} task
      * @returns {string}
      */
@@ -55,63 +54,31 @@ export default {
       return '#42b983';
     },
     /**
-     * Get path points
+     * Get path between two tasks
      *
-     * @param {any} fromTaskId
-     * @param {any} toTaskId
+     * @param {object} fromTask
+     * @param {object} toTask
      * @returns {string}
      */
-    getPoints(fromTaskId, toTaskId) {
-      const fromTask = this.root.getTask(fromTaskId);
-      const toTask = this.root.getTask(toTaskId);
-      if (
-        fromTask === null ||
-        toTask === null ||
-        !this.root.isTaskVisible(toTask) ||
-        !this.root.isTaskVisible(fromTask)
-      ) {
-        return null;
-      }
-      const startX = fromTask.x + fromTask.width;
-      const startY = fromTask.y + fromTask.height / 2;
-      const stopX = toTask.x;
-      const stopY = toTask.y + toTask.height / 2;
-      const distanceX = stopX - startX;
-      let distanceY;
-      let yMultiplier = 1;
-      if (stopY >= startY) {
-        distanceY = stopY - startY;
-      } else {
-        distanceY = startY - stopY;
-        yMultiplier = -1;
-      }
-      const offset = 10;
-      const roundness = 4;
-      const isBefore = distanceX <= offset + roundness;
-      let points = `M ${startX} ${startY}
-          L ${startX + offset},${startY} `;
-      if (isBefore) {
-        points += `Q ${startX + offset + roundness},${startY} ${startX + offset + roundness},${startY +
-          roundness * yMultiplier}
-            L ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2 - roundness * yMultiplier}
-            Q ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2} ${startX + offset},${startY +
-          (distanceY * yMultiplier) / 2}
-            L ${startX - offset + distanceX},${startY + (distanceY * yMultiplier) / 2}
-            Q ${startX - offset + distanceX - roundness},${startY + (distanceY * yMultiplier) / 2} ${startX -
-          offset +
-          distanceX -
-          roundness},${startY + (distanceY * yMultiplier) / 2 + roundness * yMultiplier}
-            L ${startX - offset + distanceX - roundness},${stopY - roundness * yMultiplier}
-            Q ${startX - offset + distanceX - roundness},${stopY} ${startX - offset + distanceX},${stopY}
-            L ${stopX},${stopY}`;
-      } else {
-        points += `L ${startX + distanceX / 2 - roundness},${startY}
-            Q ${startX + distanceX / 2},${startY} ${startX + distanceX / 2},${startY + roundness * yMultiplier}
-            L ${startX + distanceX / 2},${stopY - roundness * yMultiplier}
-            Q ${startX + distanceX / 2},${stopY} ${startX + distanceX / 2 + roundness},${stopY}
-            L ${stopX},${stopY}`;
-      }
-      return points;
+    getPath(fromTask, toTask) {
+      // 시작점 (의존하는 task의 오른쪽 중앙)
+      const startX = fromTask.x + 24; // task width가 24
+      const startY = fromTask.y + this.root.state.options.row.height / 2; // row의 중앙
+
+      // 끝점 (현재 task의 왼쪽 중앙)
+      const endX = toTask.x;
+      const endY = toTask.y + this.root.state.options.row.height / 2; // row의 중앙
+
+      // 중간 지점 계산
+      const midX = startX + (endX - startX) / 2;
+
+      // 단순한 꺾인 선 경로 생성 (ㄱ자 형태)
+      const path = `M ${startX} ${startY} 
+                   L ${midX} ${startY} 
+                   L ${midX} ${endY} 
+                   L ${endX} ${endY}`;
+
+      return path;
     }
   },
   computed: {
@@ -127,25 +94,8 @@ export default {
           task.dependentOn.forEach(dependentId => {
             const dependentTask = this.root.visibleTasks.find(t => t.id === dependentId);
             if (dependentTask) {
-              // 시작점 (의존하는 task의 오른쪽 중앙)
-              const startX = dependentTask.x + 24; // task width가 24
-              const startY = dependentTask.y + this.root.state.options.row.height / 2; // row의 중앙
-
-              // 끝점 (현재 task의 왼쪽 중앙)
-              const endX = task.x;
-              const endY = task.y + this.root.state.options.row.height / 2; // row의 중앙
-
-              // 곡선 제어점
-              const controlPoint1X = startX + Math.min((endX - startX) * 0.5, 50);
-              const controlPoint1Y = startY;
-              const controlPoint2X = endX - Math.min((endX - startX) * 0.5, 50);
-              const controlPoint2Y = endY;
-
-              // 베지어 곡선 경로 생성
-              const path = `M ${startX} ${startY} 
-                          C ${controlPoint1X} ${controlPoint1Y},
-                            ${controlPoint2X} ${controlPoint2Y},
-                            ${endX} ${endY}`;
+              // 메서드를 사용하여 경로 생성
+              const path = this.getPath(dependentTask, task);
 
               lines.push({
                 id: `${dependentTask.id}-${task.id}`,
@@ -173,10 +123,13 @@ export default {
 }
 
 .gantt-elastic__chart-dependency-lines-path {
-  transition: stroke-width 0.2s;
+  fill: none;
+  stroke: #42b983;
+  stroke-width: 2px;
 }
 
 .gantt-elastic__chart-dependency-lines-path:hover {
   stroke-width: 3px;
+  transition: stroke-width 0.2s;
 }
 </style>
