@@ -305,7 +305,8 @@ export default {
         this.dragStartX = e.clientX;
         this.dragStartY = e.clientY;
 
-        this.emitEvent('taskDragging', { tasks: selectedTasks, event: e });
+        // 올바른 이벤트 이름으로 변경
+        this.$emit('chart-task-taskDragging', { tasks: selectedTasks, event: e });
       };
 
       const onMouseUp = e => {
@@ -421,11 +422,34 @@ export default {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
-        this.emitEvent('taskDragEnd', { tasks: selectedTasks, event: e });
+        // 올바른 이벤트 이름으로 변경
+        this.$emit('chart-task-taskDragEnd', { tasks: selectedTasks, event: e });
+
+        // 드래그 완료 후 선택 초기화
+        setTimeout(() => {
+          // 모든 선택 초기화
+          this.root.updateSelectedTasks([]);
+
+          // 모든 task의 선택 상태 시각적 표시 제거
+          document.querySelectorAll('.gantt-elastic__chart-row-task-wrapper.selected').forEach(el => {
+            el.classList.remove('selected');
+          });
+
+          // 선택 표시 원 제거를 위해 isSelected 상태 업데이트
+          this.isSelected = false;
+        }, 100); // 약간의 지연을 두어 이벤트 처리 완료 후 초기화되도록 함
       };
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
+    },
+
+    /**
+     * 이벤트 발생
+     */
+    emitEvent(eventName, event) {
+      // 올바른 이벤트 이름 형식으로 변경
+      this.$emit('chart-task-' + eventName, { task: this.task, event });
     }
   },
   watch: {
