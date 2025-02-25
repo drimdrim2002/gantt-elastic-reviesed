@@ -203,6 +203,10 @@ export default {
               // 현재 작업과 마지막 작업이 같은 row에 있는지 확인
               if (lastTask.row !== task.row) {
                 alert('다른 row의 task는 선택할 수 없습니다. 같은 row의 task만 선택 가능합니다.');
+                // 마지막 선택 task 초기화
+                this.lastSelectedTaskId = null;
+                // 선택된 모든 task 초기화
+                updateSelection([]);
                 return;
               }
 
@@ -254,6 +258,19 @@ export default {
         }
         // Ctrl/Cmd 키를 누른 상태에서 클릭한 경우
         else if (originalEvent.ctrlKey || originalEvent.metaKey || this.ctrlKeyPressed) {
+          // 다른 row 선택 시도 체크
+          if (currentSelection.length > 0) {
+            const selectedRow = currentSelection[0].row;
+            if (task.row !== selectedRow) {
+              alert('다른 row의 task는 선택할 수 없습니다. 같은 row의 task만 선택 가능합니다.');
+              // 마지막 선택 task 초기화
+              this.lastSelectedTaskId = null;
+              // 선택된 모든 task 초기화
+              updateSelection([]);
+              return;
+            }
+          }
+
           if (isSelected) {
             // 이미 선택된 task라면 제거
             updateSelection(currentSelection.filter(t => t.id !== task.id));
