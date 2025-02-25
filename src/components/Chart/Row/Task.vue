@@ -43,9 +43,9 @@
       }"
       :x="task.x"
       :y="task.y"
-      :width="task.width"
-      :height="task.height"
-      :viewBox="`0 0 ${task.width} ${task.height}`"
+      :width="24"
+      :height="24"
+      :viewBox="'0 0 24 24'"
       @click="onTaskClick"
       @mouseenter="emitEvent('mouseenter', $event)"
       @mouseover="emitEvent('mouseover', $event)"
@@ -59,10 +59,10 @@
     >
       <defs>
         <clipPath :id="clipPathId">
-          <polygon :points="getPoints"></polygon>
+          <circle cx="12" cy="12" r="12" />
         </clipPath>
       </defs>
-      <polygon
+      <circle
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-task-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
@@ -70,12 +70,15 @@
           ...task.style['base'],
           ...task.style['chart-row-bar-polygon']
         }"
-        :points="getPoints"
-      ></polygon>
+        cx="12"
+        cy="12"
+        r="12"
+        fill="#42b983"
+      ></circle>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
       <text
-        :x="task.width / 2"
-        :y="task.height / 2"
+        x="12"
+        y="12"
         text-anchor="middle"
         alignment-baseline="middle"
         :style="{
@@ -125,16 +128,6 @@ export default {
      */
     clipPathId() {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
-    },
-
-    /**
-     * Get points
-     *
-     * @returns {string}
-     */
-    getPoints() {
-      const task = this.task;
-      return `0,0 ${task.width},0 ${task.width},${task.height} 0,${task.height}`;
     }
   },
   methods: {
