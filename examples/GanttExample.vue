@@ -88,13 +88,10 @@ export default {
     };
   },
   methods: {
-    getDate(hours) {
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth() + 1;
-      const currentDay = currentDate.getDate();
-      const timeStamp = new Date(`${currentYear}-${currentMonth}-${currentDay} 00:00:00`).getTime();
-      return new Date(timeStamp + hours * 60 * 60 * 1000).getTime();
+    getDate({ year, month, day, hour = 0, minute = 0, second = 0 }) {
+      // month는 0부터 시작하므로 1을 빼줍니다
+      const date = new Date(year, month - 1, day, hour, minute, second);
+      return date.getTime();
     },
     getTasks() {
       return [
@@ -103,8 +100,8 @@ export default {
           label: '1',
           user:
             '<a href="https://www.google.com/search?q=John+Doe" target="_blank" style="color:#0077c0;">John Doe</a>',
-          start: this.getDate(-24 * 5),
-          duration: 0.5 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 6 }), // 2024년 3월 1일 09:00:00
+          duration: 0.1 * 24 * 60 * 60 * 1000,
           progress: 85,
           type: 'task',
           row: 0
@@ -114,8 +111,8 @@ export default {
           label: '2',
           user:
             '<a href="https://www.google.com/search?q=Peter+Parker" target="_blank" style="color:#0077c0;">Peter Parker</a>',
-          start: this.getDate(-24 * 3),
-          duration: 0.5 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 10, minute: 30 }), // 2024년 3월 1일 13:30:00
+          duration: 0.1 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
           row: 0,
@@ -126,8 +123,8 @@ export default {
           label: '3',
           user:
             '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
-          start: this.getDate(-24 * 2),
-          duration: 0.4 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 6, minute: 0, second: 0 }),
+          duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
           row: 1
@@ -137,8 +134,8 @@ export default {
           label: '4',
           user:
             '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
-          start: this.getDate(-24 * 1),
-          duration: 0.3 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 8, minute: 0, second: 0 }),
+          duration: 0.1 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
           dependentOn: [3],
@@ -149,8 +146,8 @@ export default {
           label: '5',
           user:
             '<a href="https://www.google.com/search?q=John+Wayne" target="_blank" style="color:#0077c0;">John Wayne</a>',
-          start: this.getDate(-24 * 2),
-          duration: 0.3 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 6, minute: 0, second: 0 }),
+          duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 100,
           type: 'task',
           row: 2
@@ -160,8 +157,8 @@ export default {
           label: '6',
           user:
             '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
-          start: this.getDate(-24 * 1.5),
-          duration: 0.2 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 8, minute: 0, second: 0 }),
+          duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
           row: 2,
@@ -172,8 +169,8 @@ export default {
           label: '7',
           user:
             '<a href="https://www.google.com/search?q=Clark+Kent" target="_blank" style="color:#0077c0;">Clark Kent</a>',
-          start: this.getDate(-24 * 1),
-          duration: 0.3 * 24 * 60 * 60 * 1000,
+          start: this.getDate({ year: 2024, month: 1, day: 1, hour: 10, minute: 0, second: 0 }),
+          duration: 0.05 * 24 * 60 * 60 * 1000,
           progress: 50,
           type: 'task',
           row: 2,
