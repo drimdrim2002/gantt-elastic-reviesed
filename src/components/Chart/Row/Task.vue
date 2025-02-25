@@ -47,7 +47,8 @@
       :height="24"
       :viewBox="'0 0 24 24'"
       @click="onTaskClick"
-      @mouseenter="emitEvent('mouseenter', $event)"
+      @mouseenter="showTooltip"
+      @mouseleave="hideTooltip"
       @mouseover="emitEvent('mouseover', $event)"
       @mouseout="emitEvent('mouseout', $event)"
       @mousedown.stop="onDragStart"
@@ -92,6 +93,15 @@
         {{ task.label }}
       </text>
     </svg>
+    <!-- SVG foreignObject 기반 툴팁 -->
+    <foreignObject v-if="showingTooltip" :x="tooltipX" :y="tooltipY" width="200" height="100" class="task-tooltip">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="tooltip-content">
+        <div><strong>Task:</strong> {{ task.label }}</div>
+        <div><strong>Start:</strong> {{ formatDate(task.start) }}</div>
+        <div><strong>Duration:</strong> {{ formatDuration(task.duration) }}</div>
+        <div><strong>Progress:</strong> {{ task.progress }}%</div>
+      </div>
+    </foreignObject>
   </g>
 </template>
 
@@ -117,7 +127,10 @@ export default {
       dragStartX: 0,
       dragStartY: 0,
       originalPositions: [],
-      isSelected: false
+      isSelected: false,
+      showingTooltip: false,
+      tooltipX: 0,
+      tooltipY: 0
     };
   },
   computed: {
@@ -128,9 +141,56 @@ export default {
      */
     clipPathId() {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
+    },
+    /**
+     * Get tooltip style
+     */
+    tooltipStyle() {
+      return {
+        position: 'absolute',
+        left: `${this.tooltipX}px`,
+        top: `${this.tooltipY}px`,
+        zIndex: 9999
+      };
     }
   },
   methods: {
+    /**
+     * Show tooltip
+     */
+    showTooltip(event) {
+      // SVG 좌표계에서 tooltip 위치 계산
+      this.tooltipX = Number(this.task.x) + 30; // task 오른쪽에 30px 떨어진 위치
+      this.tooltipY = Number(this.task.y) - 60; // task 위쪽으로 60px 떨어진 위치
+
+      this.showingTooltip = true;
+      this.emitEvent('mouseenter', event);
+    },
+
+    /**
+     * Hide tooltip
+     */
+    hideTooltip(event) {
+      this.showingTooltip = false;
+      this.emitEvent('mouseleave', event);
+    },
+
+    /**
+     * Format date
+     */
+    formatDate(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    },
+
+    /**
+     * Format duration
+     */
+    formatDuration(duration) {
+      const hours = duration / (60 * 60 * 1000);
+      return `${hours.toFixed(1)} hours`;
+    },
+
     onTaskClick(event) {
       event.stopPropagation(); // 이벤트 버블링만 중단
 
@@ -301,6 +361,25 @@ export default {
 </script>
 
 <style scoped>
+.task-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.tooltip-content {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid #ddd;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #333;
+  min-width: 150px;
+  white-space: nowrap;
+}
+
 .gantt-elastic__chart-row-bar-wrapper {
   user-select: none;
 }
