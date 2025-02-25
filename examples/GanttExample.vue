@@ -40,7 +40,7 @@ export default {
           html: false
         },
         row: {
-          height: 24
+          height: 30
         },
         maxRows: 100,
         maxHeight: 0,
@@ -94,6 +94,16 @@ export default {
               }
             }
           ]
+        },
+        calendar: {
+          gap: 3
+        },
+        chart: {
+          grid: {
+            horizontal: {
+              gap: 3
+            }
+          }
         }
       }
     };

@@ -159,11 +159,29 @@ export default {
      * Show tooltip
      */
     showTooltip(event) {
-      // SVG 좌표계에서 tooltip 위치 계산
-      this.tooltipX = Number(this.task.x) + 30; // task 오른쪽에 30px 떨어진 위치
-      this.tooltipY = Number(this.task.y) - 60; // task 위쪽으로 60px 떨어진 위치
+      const tooltipHeight = 100;
+      const taskWidth = 24;
+      const tooltipOffset = 10;
+      this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
+      this.tooltipY = Number(this.task.y) - tooltipHeight - tooltipOffset;
 
       this.showingTooltip = true;
+
+      // gap을 포함한 실제 row 높이 계산
+      const rowHeight =
+        this.root.state.options.row.height +
+        (this.root.state.options.calendar.gap || 0) +
+        (this.root.state.options.chart.grid.horizontal.gap || 0) * 2;
+
+      // 현재 row index 계산
+      const currentRow = Math.floor(
+        (this.task.y - this.root.state.options.calendar.gap) / this.root.state.options.row.height
+      );
+
+      console.log(
+        `task y: ${this.task.y}, row height: ${this.root.state.options.row.height}, Current row index: ${currentRow}`
+      );
+
       this.emitEvent('mouseenter', event);
     },
 
@@ -378,6 +396,7 @@ export default {
   color: #333;
   min-width: 150px;
   white-space: nowrap;
+  z-index: 9999;
 }
 
 .gantt-elastic__chart-row-bar-wrapper {
