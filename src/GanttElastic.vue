@@ -1403,11 +1403,30 @@ const GanttElastic = {
     },
 
     updateSelectedTasks(selectedTasks) {
-      this.state.selectedTasks = selectedTasks;
-      // 상위 컴포넌트로 이벤트 전달
-      this.$emit('task-selected', {
-        selectedTasks,
-        count: selectedTasks.length
+      // 명시적으로 새 배열 생성
+      this.state.selectedTasks = Array.isArray(selectedTasks) ? [...selectedTasks] : [];
+
+      // 모든 task의 선택 상태 초기화 (스타일 적용 해제를 위해)
+      if (this.state.selectedTasks.length === 0) {
+        // 모든 visible task에 대해 isSelected 속성 초기화
+        this.visibleTasks.forEach(task => {
+          task.isSelected = false;
+        });
+      }
+
+      // 상태 변경 알림
+      this.$nextTick(() => {
+        // 선택된 task들에 isSelected 속성 설정
+        this.state.selectedTasks.forEach(task => {
+          task.isSelected = true;
+        });
+
+        // 이벤트 발생
+        this.$emit('tasks-selected', this.state.selectedTasks);
+        this.$emit('task-selected', {
+          selectedTasks: this.state.selectedTasks,
+          count: this.state.selectedTasks.length
+        });
       });
     }
   },
