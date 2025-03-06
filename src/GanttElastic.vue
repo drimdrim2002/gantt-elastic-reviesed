@@ -1205,6 +1205,26 @@ const GanttElastic = {
       this.computeDayWidths();
       this.computeHourWidths();
       this.computeMonthWidths();
+      
+      // 안전하게 상위 컴포넌트의 너비 확인 (window.innerWidth는 항상 사용 가능)
+      const parentWidth = window.innerWidth - 40;
+      console.log('parentWidth', parentWidth);
+      
+      // 최소 너비 설정
+      const totalWidth = this.state.options.times.totalViewDurationPx ;
+      console.log('totalWidth', totalWidth);
+      console.log('parentWidth', parentWidth);
+      
+      if (totalWidth < parentWidth) {
+        // 최소 너비보다 작은 경우, 스케일 조정
+        const scaleFactor = parentWidth / totalWidth;
+        this.state.options.times.timePerPixel = this.state.options.times.timePerPixel / scaleFactor;
+        this.state.options.times.totalViewDurationPx = parentWidth;
+        this.state.options.width = parentWidth;
+        
+        // 스텝 재계산
+        this.calculateSteps();
+      }
     },
 
     /**
@@ -1449,7 +1469,6 @@ const GanttElastic = {
     visibleTasks() {
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
       const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
-
       // Group tasks by row
       const tasksByRow = {};
       maxRows.forEach(task => {
@@ -1647,7 +1666,6 @@ const GanttElastic = {
 };
 export default GanttElastic;
 </script>
-
 <style>
 [class^='gantt-elastic'],
 [class*=' gantt-elastic'] {
@@ -1689,3 +1707,5 @@ foreignObject > * {
   position: absolute;
 }
 </style>
+
+
