@@ -152,18 +152,17 @@ export default {
      * @returns {object}
      */
     timeLinePosition() {
-      const d = new Date();
-      const current = d.getTime();
-      const currentOffset = this.root.timeToPixelOffsetX(current);
+      const firstTime = this.root.state.options.times.firstTime;
+      const firstTimeOffset = this.root.timeToPixelOffsetX(firstTime);
       const timeLine = {
         x: 0,
         y1: 0,
         y2: '100%',
         dateTime: '',
-        time: current
+        time: firstTime
       };
-      timeLine.x = currentOffset;
-      timeLine.dateTime = d.toLocaleDateString();
+      timeLine.x = firstTimeOffset;
+      timeLine.dateTime = new Date(firstTime).toLocaleDateString();
       return timeLine;
     }
   }
