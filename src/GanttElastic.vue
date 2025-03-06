@@ -97,7 +97,7 @@ function getOptions(userOptions) {
     },
     times: {
       timeScale: 60 * 1000,
-      timeZoom: 17, //*
+      timeZoom: 1, //* 초기 줌 레벨 (작을수록 더 확대됨)
       timePerPixel: 0,
       firstTime: null,
       lastTime: null,
@@ -1120,8 +1120,10 @@ const GanttElastic = {
       let min = this.state.options.times.timeScale;
       let steps = max / min;
       let percent = this.state.options.times.timeZoom / 100;
+      const applyScale = 5;
       this.state.options.times.timePerPixel =
-        this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom);
+        (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom)) 
+        / applyScale;
       this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
         this.state.options.times.firstTime,
         'milliseconds'

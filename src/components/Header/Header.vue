@@ -41,7 +41,7 @@
           ref="sliderWrapper"
         >
           <div v-if="showCustomTooltip" class="custom-tooltip" :style="customTooltipStyle">
-            Zoom: {{ scale.toFixed(1) }}
+            Zoom: {{ scale }}
           </div>
           <vue-slider
             class="gantt-elastic__header-slider"
@@ -222,7 +222,7 @@ export default {
   inject: ['root'],
   data() {
     return {
-      zoomMax: 3,
+      zoomMax: 5,
       zoomMin: 1,
       zoomStep: 0.1,
       scaleTimeoutId: null,
