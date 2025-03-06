@@ -222,7 +222,7 @@ export default {
   inject: ['root'],
   data() {
     return {
-      zoomMax: 10,
+      // zoomMax: 10,
       zoomMin: 1,
       zoomStep: 0.1,
       scaleTimeoutId: null,
@@ -333,12 +333,32 @@ export default {
       }
       return false;
     },
+    /**
+     * day 수에 따라 동적으로 zoomMax 값을 계산
+     * @returns {number}
+     */
+    zoomMax() {
+      // root에서 steps 정보 가져오기
+      const steps = this.root.state.options.times.steps || [];
+      
+      // day 수 계산 (steps 길이가 day 수와 동일)
+      const daysCount = steps.length;
+      
+      // day 수에 따라 zoomMax 값 설정
+      if (daysCount <= 1) {
+        return 5;  // day가 1개 이하면 zoomMax는 5
+      } else {
+        return 5 * daysCount;
+      }
+    },
     scale: {
       get() {
         return this.localScale;
       },
       set(value) {
-        this.localScale = Number(value.toFixed(1));
+        // zoomMax를 초과하지 않도록 제한
+        const limitedValue = Math.min(value, this.zoomMax);
+        this.localScale = Number(limitedValue.toFixed(1));
         this.setScale(this.localScale);
       }
     },
