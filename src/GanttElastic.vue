@@ -1341,15 +1341,15 @@ const GanttElastic = {
       this.state.options.times.lastTaskTime = lastTaskTime;
       this.state.options.times.firstTime = dayjs(firstTaskTime)
         .locale(this.state.options.locale.name)
-        .startOf('day')
-        .subtract(this.state.options.scope.before, 'days')
-        .startOf('day')
+        .startOf('hour')
+        .subtract(this.state.options.scope.before, 'hours')
+        .startOf('hour')
         .valueOf();
       this.state.options.times.lastTime = dayjs(lastTaskTime)
         .locale(this.state.options.locale.name)
-        .endOf('day')
-        .add(this.state.options.scope.after, 'days')
-        .endOf('day')
+        .endOf('hour')
+        .add(this.state.options.scope.after, 'hours')
+        .endOf('hour')
         .valueOf();
     },
 
