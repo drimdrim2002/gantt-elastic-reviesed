@@ -73,6 +73,16 @@ export default {
       const additionalSpace = stroke + 2;
       let fullWidth = this.root.state.options.width;
       let formatNames = Object.keys(this.root.state.options.calendar.day.format);
+      
+      // steps가 비어있는 경우 처리
+      if (this.root.state.options.times.steps.length === 0) {
+        return {
+          count: 1,
+          type: formatNames[0] || 'short'
+        };
+      }
+      
+      // 일반적인 경우 처리
       for (let days = this.root.state.options.times.steps.length; days > 1; days = Math.ceil(days / 2)) {
         for (let formatName of formatNames) {
           if (
@@ -86,9 +96,11 @@ export default {
           }
         }
       }
+      
+      // 적합한 day 수를 찾지 못한 경우, 최소 1개의 day를 표시
       return {
-        count: 0,
-        type: ''
+        count: 1,
+        type: formatNames[0] || 'short'
       };
     },
 
@@ -199,8 +211,33 @@ export default {
       if (daysCount.count === 0) {
         return days;
       }
+      
       const steps = this.root.state.options.times.steps;
       const localeName = this.root.state.options.locale.name;
+      
+      // steps가 비어있는 경우 전체 너비를 사용하는 하나의 day를 생성
+      if (steps.length === 0) {
+        const totalWidth = this.root.state.options.width;
+        const currentDate = dayjs(); // 현재 날짜 사용
+        
+        days.push({
+          index: 0,
+          key: 'default-day',
+          x: 0,
+          y: this.root.state.options.calendar.month.height,
+          width: totalWidth,
+          textWidth: 0,
+          height: this.root.state.options.calendar.day.height,
+          label: this.root.state.options.calendar.day.format[daysCount.type](currentDate.locale(localeName))
+        });
+        
+        return days.map(item => ({
+          key: item.key,
+          children: [item]
+        }));
+      }
+      
+      // 일반적인 경우 처리
       const dayStep = Math.ceil(steps.length / daysCount.count);
       for (let dayIndex = 0, len = steps.length; dayIndex < len; dayIndex += dayStep) {
         let dayWidthPx = 0;
