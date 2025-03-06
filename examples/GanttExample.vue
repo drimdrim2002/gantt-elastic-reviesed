@@ -25,7 +25,7 @@ export default {
       selectedTasksCount: 0,
       options: {
         times: {
-          timeZoom: 3,
+          timeZoom: 2,
           scope: {
             before: 0,
             after: 0
