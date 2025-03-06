@@ -203,7 +203,7 @@ const defaultOptions = {
     html: false
   },
   locale: {
-    Now: 'Now',
+    Now: 'Start',
     'X-Scale': 'Zoom-X',
     'Y-Scale': 'Zoom-Y',
     'Task list width': 'Task list',
