@@ -1119,7 +1119,11 @@ const GanttElastic = {
       let max = this.state.options.times.timeScale * 60;
       let min = this.state.options.times.timeScale;
       let steps = max / min;
+      
       let percent = this.state.options.times.timeZoom / 100;
+      console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
+      console.log(`percent: ${percent}`);
+      
       const applyScale = 5;
       this.state.options.times.timePerPixel =
         (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom)) 
@@ -1265,6 +1269,35 @@ const GanttElastic = {
       const style = { ...this.style['calendar-row-text'], ...this.style['calendar-row-text--day'] };
       this.state.ctx.font = style['font-size'] + ' ' + style['font-family'];
       const localeName = this.state.options.locale.name;
+      
+      // steps가 비어있는 경우 처리
+      if (this.state.options.times.steps.length === 0) {
+        let maxWidths = this.state.options.calendar.day.maxWidths;
+        this.state.options.calendar.day.widths = [];
+        
+        // maxWidths가 객체가 아니거나 비어있는 경우 초기화
+        if (typeof maxWidths !== 'object' || Object.keys(maxWidths).length === 0) {
+          maxWidths = { short: 0, medium: 0, long: 0 };
+          this.state.options.calendar.day.maxWidths = maxWidths;
+        }
+        
+        // 현재 날짜를 사용하여 너비 계산
+        const currentDate = dayjs();
+        const widths = { day: 0 };
+        
+        Object.keys(this.state.options.calendar.day.format).forEach(formatName => {
+          maxWidths[formatName] = 0;
+          widths[formatName] = this.state.ctx.measureText(
+            this.state.options.calendar.day.format[formatName](currentDate.locale(localeName))
+          ).width;
+          maxWidths[formatName] = widths[formatName];
+        });
+        
+        this.state.options.calendar.day.widths.push(widths);
+        return;
+      }
+      
+      // 일반적인 경우 처리
       let currentDate = dayjs(this.state.options.times.steps[0].time).locale(localeName);
       let maxWidths = this.state.options.calendar.day.maxWidths;
       this.state.options.calendar.day.widths = [];
