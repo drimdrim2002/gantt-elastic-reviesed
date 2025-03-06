@@ -50,9 +50,9 @@
             :process-style="{ ...style['header-slider--process'] }"
             :slider-style="{ ...style['header-slider--slider'] }"
             v-model="scale"
-            :max="3"
-            :min="0"
-            :step="0.5"
+            :max="this.zoomMax"
+            :min="this.zoomMin"
+            :step="this.zoomStep"
             width="100px"
             @input="updateTooltipPosition"
           ></vue-slider>
@@ -142,6 +142,7 @@ import vueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 import Switches from 'vue-switches';
 
+
 const defaultStyle = {
   header: {
     margin: '0px auto',
@@ -199,7 +200,7 @@ const defaultStyle = {
 };
 const defaultOptions = {
   title: {
-    label: 'gantt-elastic',
+    label: '',
     html: false
   },
   locale: {
@@ -221,6 +222,9 @@ export default {
   inject: ['root'],
   data() {
     return {
+      zoomMax: 3,
+      zoomMin: 1,
+      zoomStep: 0.1,
       scaleTimeoutId: null,
       firstScale: false,
       localScale: 0,
