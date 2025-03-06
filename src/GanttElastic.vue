@@ -1206,14 +1206,11 @@ const GanttElastic = {
       this.computeHourWidths();
       this.computeMonthWidths();
       
-      // 안전하게 상위 컴포넌트의 너비 확인 (window.innerWidth는 항상 사용 가능)
-      const parentWidth = window.innerWidth - 40;
-      console.log('parentWidth', parentWidth);
+      // 브라우저 너비를 최소 너비로 설정
+      const parentWidth = window.innerWidth -40;
       
       // 최소 너비 설정
-      const totalWidth = this.state.options.times.totalViewDurationPx ;
-      console.log('totalWidth', totalWidth);
-      console.log('parentWidth', parentWidth);
+      const totalWidth = this.state.options.times.totalViewDurationPx;
       
       if (totalWidth < parentWidth) {
         // 최소 너비보다 작은 경우, 스케일 조정
@@ -1616,6 +1613,8 @@ const GanttElastic = {
     this.state.options.clientWidth = this.$el.clientWidth;
     this.state.resizeObserver = new ResizeObserver((entries, observer) => {
       this.globalOnResize();
+      // 브라우저 크기 변경 시 캘린더 너비도 재계산
+      this.computeCalendarWidths();
     });
     this.state.resizeObserver.observe(this.$el.parentNode);
     this.globalOnResize();
