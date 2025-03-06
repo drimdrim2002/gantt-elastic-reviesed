@@ -52,47 +52,7 @@ export default {
               value: 'id',
               width: 40
             },
-            {
-              id: 2,
-              label: 'Description',
-              value: 'label',
-              width: 200,
-              expander: true
-            },
-            {
-              id: 3,
-              label: 'Assigned to',
-              value: 'user',
-              width: 130,
-              html: true
-            },
-            {
-              id: 3,
-              label: 'Start',
-              value: task => dayjs(task.start).format('YYYY-MM-DD'),
-              width: 78
-            },
-            {
-              id: 4,
-              label: 'Type',
-              value: 'type',
-              width: 68
-            },
-            {
-              id: 5,
-              label: '%',
-              value: 'progress',
-              width: 35,
-              style: {
-                'task-list-header-label': {
-                  'text-align': 'center',
-                  width: '100%'
-                },
-                'task-list-item-value-container': {
-                  'text-align': 'center'
-                }
-              }
-            }
+              
           ]
         },
         calendar: {

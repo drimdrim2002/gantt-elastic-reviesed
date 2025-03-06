@@ -461,31 +461,40 @@ const GanttElastic = {
   data() {
     return {
       state: {
-        tasks: [],
-        selectedTasks: [],
+        // 1. 작업 관련 데이터
+        tasks: [],           // 모든 작업 목록
+        selectedTasks: [],   // 선택된 작업 목록
+        tasksById: {},       // ID로 작업을 빠르게 조회하기 위한 맵
+        taskTree: {},        // 작업의 계층 구조를 저장하는 트리
+
+        // 2. 옵션 및 스타일
         options: {
-          scrollBarHeight: 0,
-          allVisibleTasksHeight: 0,
-          outerHeight: 0,
+          scrollBarHeight: 0,        // 스크롤바 높이
+          allVisibleTasksHeight: 0,  // 모든 보이는 작업의 총 높이
+          outerHeight: 0,            // 외부 컨테이너 높이
           scroll: {
-            left: 0,
-            top: 0
+            left: 0,                 // 가로 스크롤 위치
+            top: 0                   // 세로 스크롤 위치
           }
         },
-        dynamicStyle: {},
-        refs: {},
-        tasksById: {},
-        taskTree: {},
-        ctx,
-        emitTasksChanges: true, // some operations may pause emitting changes to parent component
-        emitOptionsChanges: true, // some operations may pause emitting changes to parent component
-        resizeObserver: null,
-        unwatchTasks: null,
-        unwatchOptions: null,
-        unwatchStyle: null,
-        unwatchOutputTasks: null,
-        unwatchOutputOptions: null,
-        unwatchOutputStyle: null
+        dynamicStyle: {},           // 동적 스타일 설정
+
+        // 3. 참조 및 컨텍스트
+        refs: {},                   // DOM 요소 참조 저장
+        ctx,                        // 캔버스 컨텍스트 (텍스트 측정용)
+
+        // 4. 상태 제어 플래그
+        emitTasksChanges: true,     // 작업 변경 이벤트 발생 여부
+        emitOptionsChanges: true,   // 옵션 변경 이벤트 발생 여부
+
+        // 5. 리소스 관리
+        resizeObserver: null,       // 크기 변경 감지기
+        unwatchTasks: null,         // 작업 감시자 해제 함수
+        unwatchOptions: null,       // 옵션 감시자 해제 함수
+        unwatchStyle: null,         // 스타일 감시자 해제 함수
+        unwatchOutputTasks: null,   // 출력 작업 감시자 해제 함수
+        unwatchOutputOptions: null, // 출력 옵션 감시자 해제 함수
+        unwatchOutputStyle: null    // 출력 스타일 감시자 해제 함수
       }
     };
   },
