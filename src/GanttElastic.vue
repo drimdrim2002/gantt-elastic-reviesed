@@ -1121,8 +1121,8 @@ const GanttElastic = {
       let steps = max / min;
       
       let percent = this.state.options.times.timeZoom / 100;
-      console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
-      console.log(`percent: ${percent}`);
+      // console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
+      // console.log(`percent: ${percent}`);
       
       const applyScale = 1;
       this.state.options.times.timePerPixel =

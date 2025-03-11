@@ -27,7 +27,13 @@ export default {
       selectedTasksCount: 0,
       options: {
         times: {
+          timeScale: 60 * 1000,
           timeZoom: 2,
+          firstTime: this.getDate({ year: 2024, month: 8, day: 2 , hour: 19 }),
+          lastTime: this.getDate({ year: 2024, month: 8, day: 3 , hour: 19 }),
+
+          firstTaskTime: this.getDate({ year: 2024, month: 8, day: 2 , hour: 22 }),
+          lastTaskTime: this.getDate({ year: 2024, month: 8, day: 3 , hour: 13 }),
           scope: {
             before: 0,
             after: 0
