@@ -45,7 +45,7 @@
             ref="chartGraphSvg"
             x="0"
             y="0"
-            :width="root.state.options.width + 'px'"
+            :width="isNaN(root.state.options.width) ? 0 : root.state.options.width + 'px'"
             :height="root.state.options.allVisibleTasksHeight + 'px'"
             xmlns="http://www.w3.org/2000/svg"
             @keydown="onKeyDown"

@@ -13,7 +13,7 @@
     ref="chart"
     x="0"
     y="0"
-    :width="root.state.options.width"
+    :width="isNaN(root.state.options.width) ? 0 : root.state.options.width"
     :height="root.state.options.allVisibleTasksHeight"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -23,9 +23,9 @@
         :style="{ ...root.style['grid-line-horizontal'] }"
         v-for="line in horizontalLines"
         :key="line.key"
-        :x1="line.x1"
+        :x1="isNaN(line.x1) ? 0 : line.x1"
         :y1="line.y1"
-        :x2="line.x2"
+        :x2="isNaN(line.x2) ? 0 : line.x2"
         :y2="line.y2"
       ></line>
       <line
@@ -33,9 +33,9 @@
         :style="{ ...root.style['grid-line-vertical'] }"
         v-for="line in verticalLines"
         :key="line.key"
-        :x1="line.x1"
+        :x1="isNaN(line.x1) ? 0 : line.x1"
         :y1="line.y1"
-        :x2="line.x2"
+        :x2="isNaN(line.x2) ? 0 : line.x2"
         :y2="line.y2"
       ></line>
       <line
@@ -161,8 +161,10 @@ export default {
         dateTime: '',
         time: firstTime
       };
-      timeLine.x = firstTimeOffset;
-      timeLine.dateTime = new Date(firstTime).toLocaleDateString();
+      if (!isNaN(firstTime) && !isNaN(firstTimeOffset)) {
+        timeLine.x = firstTimeOffset;
+        timeLine.dateTime = new Date(firstTime).toLocaleDateString();
+      }
       return timeLine;
     }
   }
