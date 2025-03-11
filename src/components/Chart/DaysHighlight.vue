@@ -17,9 +17,9 @@
       class="gantt-elastic__chart-days-highlight-rect"
       v-for="day in workingDays"
       :key="getKey(day)"
-      :x="day.offset.px"
+      :x="day.offset.px || 0"
       y="0"
-      :width="day.width.px"
+      :width="isNaN(day.width.px) ? 0 : day.width.px"
       height="100%"
       :style="{ ...root.style['chart-days-highlight-rect'] }"
     ></rect>
@@ -52,7 +52,17 @@ export default {
      * @returns {array}
      */
     workingDays() {
+      if (!this.root.state.options.times.steps || !Array.isArray(this.root.state.options.times.steps)) {
+        console.warn('DaysHighlight: steps is not an array');
+        return [];
+      }
+      
       return this.root.state.options.times.steps.filter(step => {
+        if (!step || typeof step.time === 'undefined' || !step.width || typeof step.width.px === 'undefined') {
+          console.warn('DaysHighlight: Invalid step object', step);
+          return false;
+        }
+        
         return this.root.state.options.calendar.workingDays.indexOf(dayjs(step.time).day()) === -1;
       });
     },
