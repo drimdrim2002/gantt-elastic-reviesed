@@ -27,6 +27,7 @@ export const convertToInput = async function(_input) {
         const duration = taskPeridVal > 0? taskPeridVal : 600;
         const type = 'task';
         const row = routeIdToRowIndex[routeId];
+        const progress = 100;
         const dependentOn = []
         if (parseInt(stopSeqNo) > 0) {
             const prevStopSeqNo = parseInt(stopSeqNo) - 1;
@@ -45,7 +46,7 @@ export const convertToInput = async function(_input) {
         }
 
         const ganttInfo = {
-            id, label, startTime, duration, type, row, dependentOn, style
+            id, label, startTime, duration, type, row, dependentOn, style, progress
         }
 
         ganttInfoArray.push(ganttInfo);
