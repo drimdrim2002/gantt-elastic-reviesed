@@ -52,7 +52,7 @@
             @keyup="onKeyUp"
             tabindex="0"
           >
-            <days-highlight></days-highlight>
+            <!-- <days-highlight></days-highlight> -->
             <grid></grid>
             <dependency-lines :tasks="root.visibleTasks"></dependency-lines>
             <g
@@ -79,7 +79,7 @@
 
 <script>
 import Grid from './Grid.vue';
-import DaysHighlight from './DaysHighlight.vue';
+// import DaysHighlight from './DaysHighlight.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import DependencyLines from './DependencyLines.vue';
 import Task from './Row/Task.vue';
@@ -95,7 +95,7 @@ export default {
     Task,
     Milestone,
     Project,
-    DaysHighlight
+    // DaysHighlight
   },
   inject: ['root'],
   data() {

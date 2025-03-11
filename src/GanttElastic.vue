@@ -166,7 +166,7 @@ function getOptions(userOptions) {
       }
     },
     calendar: {
-      workingDays: [1, 2, 3, 4, 5], //*
+      workingDays: [], //*
       gap: 6, //*
       height: 0,
       strokeWidth: 1,
