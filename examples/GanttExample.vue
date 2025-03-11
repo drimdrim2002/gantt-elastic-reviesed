@@ -11,7 +11,9 @@
 <script>
 import GanttElastic from '../src/GanttElastic.vue';
 import Header from '../src/components/Header/Header.vue';
-import dayjs from 'dayjs';
+import { convertToInput } from '../src/GanttDataConverter';
+import input from './input.json';
+
 
 export default {
   name: 'GanttExample',
@@ -21,7 +23,7 @@ export default {
   },
   data() {
     return {
-      tasks: this.getTasks(),
+      tasks: [],
       selectedTasksCount: 0,
       options: {
         times: {
@@ -42,7 +44,7 @@ export default {
         row: {
           height: 34
         },
-        maxRows: 100,
+        maxRows: 3000,
         maxHeight: 0,
         taskList: {
           columns: [
@@ -198,6 +200,12 @@ export default {
       console.log('Task selected:', selectedTasks, count);
       this.selectedTasksCount = count;
     }
+  },
+
+  async created() {
+    const [tasks, popupInfo] = await convertToInput(input);
+    this.tasks = tasks;
+    this.popupInfo = popupInfo;
   },
   mounted() {
     this.$root.$on('gantt-elastic-ready', ganttElasticInstance => {

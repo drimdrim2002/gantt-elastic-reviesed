@@ -97,7 +97,7 @@ function getOptions(userOptions) {
     },
     times: {
       timeScale: 60 * 1000,
-      timeZoom: 1, //* 초기 줌 레벨 (작을수록 더 확대됨)
+      timeZoom: 3, //* 초기 줌 레벨 (작을수록 더 확대됨)
       timePerPixel: 0,
       firstTime: null,
       lastTime: null,
@@ -111,7 +111,7 @@ function getOptions(userOptions) {
     row: {
       height: 24 //*
     },
-    maxRows: 20, //*
+    maxRows: 3000, //*
     maxHeight: 0, //*
     chart: {
       grid: {

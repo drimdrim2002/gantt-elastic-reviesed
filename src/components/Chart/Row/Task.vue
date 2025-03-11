@@ -359,7 +359,7 @@ export default {
           total: rowHeight
         });
 
-        const maxRows = 100;
+        const maxRows = 3000;
 
         const boundaries = [];
         for (let i = 0; i < maxRows; i++) {
