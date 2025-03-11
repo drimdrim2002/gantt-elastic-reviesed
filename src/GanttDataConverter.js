@@ -24,7 +24,7 @@ export const convertToInput = async function(_input) {
         markerId.push(id);
         const label = stopSeqNo;
         const  startTime = new Date(arrDtm).getTime();
-        const duration = taskPeridVal;
+        const duration = taskPeridVal > 0? taskPeridVal : 600;
         const type = 'task';
         const row = routeIdToRowIndex[routeId];
         const dependentOn = []
