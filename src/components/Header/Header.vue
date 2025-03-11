@@ -288,7 +288,7 @@ export default {
     updateTooltipPosition() {
       if (this.$refs.sliderWrapper) {
         const sliderWidth = this.$refs.sliderWrapper.offsetWidth;
-        const percent = (this.scale - 5) / (20 - 5);
+        const percent = (this.scale - this.zoomMin) / (this.zoomMax - this.zoomMin);
         this.tooltipLeft = percent * sliderWidth;
       }
     },
