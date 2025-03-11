@@ -222,7 +222,7 @@ export default {
   inject: ['root'],
   data() {
     return {
-      zoomMax: 5,
+      // zoomMax: 5,
       zoomMin: 1,
       zoomStep: 0.1,
       scaleTimeoutId: null,
@@ -329,6 +329,18 @@ export default {
       }
       return false;
     },
+
+    zoomMax() {
+     
+      const steps = this.root.state.options.times.steps || [];
+      const daysCount = steps.length;
+      if (steps.length <= 1 ) {
+        return 2;
+      } else {
+        return 2 * daysCount;
+      }
+    },
+    
     scale: {
       get() {
         return this.localScale;
