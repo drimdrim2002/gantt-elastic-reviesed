@@ -126,7 +126,12 @@ export default {
     this.viewBoxWidth = this.$el.clientWidth;
     this.root.state.refs.mainView = this.$refs.mainView;
     this.root.state.refs.chartContainer = this.$refs.chartContainer;
+    
+    
     this.root.state.refs.taskList = this.$refs.taskList;
+    
+    
+    
     this.root.state.refs.chartScrollContainerHorizontal = this.$refs.chartScrollContainerHorizontal;
     this.root.state.refs.chartScrollContainerVertical = this.$refs.chartScrollContainerVertical;
     document.addEventListener('mouseup', this.chartMouseUp.bind(this));

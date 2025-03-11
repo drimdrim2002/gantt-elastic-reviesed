@@ -20,7 +20,7 @@
         ref="taskListItems"
         :style="{ ...root.style['task-list-items'], height: root.state.options.rowsHeight + 'px' }"
       >
-        <task-list-item v-for="task in root.visibleTasks" :key="task.id" :task="task"></task-list-item>
+        <task-list-item v-for="task in visibleTasks" :key="task.vhclId" :task="task"></task-list-item>
       </div>
     </div>
   </div>
@@ -38,6 +38,22 @@ export default {
   inject: ['root'],
   data() {
     return {};
+  },
+
+  computed: {
+    visibleTasks() {
+      const vhclIdSet = new Set();
+      const visibleTasks = [];
+      this.root.visibleTasks.forEach(task => {
+        const vhclId = task.vhclId;
+        if (!vhclIdSet.has(vhclId)) {
+          visibleTasks.push(task);
+        } 
+        vhclIdSet.add(vhclId)
+      });
+
+      return visibleTasks;
+    }
   },
 
   /**

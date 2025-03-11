@@ -56,9 +56,9 @@ export default {
           columns: [
             {
               id: 1,
-              label: 'ID',
-              value: 'id',
-              width: 40
+              label: 'Vehicle ID',
+              value: 'vhclId',
+              width: 100
             },
               
           ]
