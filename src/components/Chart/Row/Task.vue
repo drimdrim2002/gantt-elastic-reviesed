@@ -316,15 +316,6 @@ export default {
         // 드래그 상태 해제
         this.isDragging = false;
 
-        // row 0: 0 ~20
-        // row 1: 20 ~60
-        // row 2: 60 ~100
-        // row 3: 100 ~140
-        // row 4: 140 ~180
-        // row 5: 180 ~220
-        // row 6: 220 ~260
-        // row 7: 260 ~300
-        // row 8: 300 ~340
         // 실제 드래그 이동이 없었으면 원래 위치로 복원하고 종료
         if (!this.hasMoved) {
           // 원래 위치로 복원
@@ -352,14 +343,14 @@ export default {
           (this.root.state.options.chart.grid.horizontal.gap || 0);
 
         // 디버깅용: rowHeight 구성요소 출력
-        console.log('Row 높이 계산:', {
-          'row.height': this.root.state.options.row.height,
-          'calendar.gap': this.root.state.options.calendar.gap || 0,
-          'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap || 0,
-          total: rowHeight
-        });
+        // console.log('Row 높이 계산:', {
+        //   'row.height': this.root.state.options.row.height,
+        //   'calendar.gap': this.root.state.options.calendar.gap || 0,
+        //   'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap || 0,
+        //   total: rowHeight
+        // });
 
-        const maxRows = 3000;
+        const maxRows = 200;
 
         const boundaries = [];
         for (let i = 0; i < maxRows; i++) {
@@ -374,7 +365,7 @@ export default {
 
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
-          console.log(`task 배치 전: y=${selectedTask.y}, height=${selectedTask.height}`);
+          console.log(`task 배치 전: x=${selectedTask.x}, y=${selectedTask.y}, row=${selectedTask.row}`);
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
           let rowIndex = Math.round(selectedTask.y / rowHeight);
@@ -401,7 +392,8 @@ export default {
           selectedTask.y = centerY;
           selectedTask.row = rowIndex;
 
-          console.log(`task 배치 후: y=${selectedTask.y}, row=${selectedTask.row}`);
+          console.log(`task 배치 후후: x=${selectedTask.x}, y=${selectedTask.y}, row=${selectedTask.row}`);
+
         });
 
         // 드래그 완료 위치 정보 계산 (첫 번째 선택된 task 기준)
@@ -419,35 +411,35 @@ export default {
           alert(`Task를 다음 위치로 이동했습니다:\n시간: ${formattedTime}\nRow: ${dropRow}`);
         }
 
-        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
-        const rowTasks = {};
+        // // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
+        // const rowTasks = {};
 
-        // 현재 row의 모든 task 수집
-        this.root.visibleTasks.forEach(task => {
-          if (!rowTasks[task.row]) {
-            rowTasks[task.row] = [];
-          }
-          rowTasks[task.row].push(task);
-        });
+        // // 현재 row의 모든 task 수집
+        // this.root.visibleTasks.forEach(task => {
+        //   if (!rowTasks[task.row]) {
+        //     rowTasks[task.row] = [];
+        //   }
+        //   rowTasks[task.row].push(task);
+        // });
 
-        // 각 row의 task들을 x 좌표로 정렬
-        Object.keys(rowTasks).forEach(row => {
-          const tasks = rowTasks[row];
-          tasks.sort((a, b) => a.x - b.x);
+        // // 각 row의 task들을 x 좌표로 정렬
+        // Object.keys(rowTasks).forEach(row => {
+        //   const tasks = rowTasks[row];
+        //   tasks.sort((a, b) => a.x - b.x);
 
-          // 겹침 방지
-          for (let i = 1; i < tasks.length; i++) {
-            const prevTask = tasks[i - 1];
-            const currentTask = tasks[i];
-            const minGap = 10; // 최소 간격 (픽셀)
+        //   // 겹침 방지
+        //   for (let i = 1; i < tasks.length; i++) {
+        //     const prevTask = tasks[i - 1];
+        //     const currentTask = tasks[i];
+        //     const minGap = 10; // 최소 간격 (픽셀)
 
-            if (currentTask.x < prevTask.x + prevTask.width + minGap) {
-              currentTask.x = prevTask.x + prevTask.width + minGap;
-              // 시간 정보도 업데이트
-              currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
-            }
-          }
-        });
+        //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
+        //       currentTask.x = prevTask.x + prevTask.width + minGap;
+        //       // 시간 정보도 업데이트
+        //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
+        //     }
+        //   }
+        // });
 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
