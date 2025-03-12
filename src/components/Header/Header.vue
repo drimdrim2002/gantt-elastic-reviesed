@@ -256,6 +256,12 @@ export default {
     this.sliderOptions.xScale.value = this.root.state.options.times.timeZoom;
     this.style = this.root.mergeDeep({}, defaultStyle, this.dynamicStyle);
     this.opts = this.root.mergeDeep({}, defaultOptions, this.options);
+    
+    // 마우스 휠로 zoom level이 변경될 때 zoom-slider 값을 업데이트
+    this.root.$on('times-timeZoom-updated', (newZoom) => {
+      this.localScale = newZoom;
+      this.updateTooltipPosition();
+    });
   },
   methods: {
     getImage() {
@@ -421,6 +427,14 @@ export default {
         zIndex: 1000
       };
     }
+  },
+  
+  /**
+   * 컴포넌트가 제거되기 전에 이벤트 리스너 정리
+   */
+  beforeDestroy() {
+    // 이벤트 리스너 제거
+    this.root.$off('times-timeZoom-updated');
   }
 };
 </script>

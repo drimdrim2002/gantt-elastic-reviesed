@@ -1017,6 +1017,23 @@ const GanttElastic = {
      * Mouse wheel event handler
      */
     onWheelChart(ev) {
+      // Ctrl 키를 누른 상태에서 마우스 휠을 사용하면 zoom 조절
+      if (ev.ctrlKey) {
+        ev.preventDefault();
+        // 마우스 휠 방향에 따라 확대/축소 (deltaY가 양수면 축소, 음수면 확대)
+        const delta = ev.deltaY > 0 ? 0.5 : -0.5;
+        // 현재 timeZoom 값
+        let timeZoom = this.state.options.times.timeZoom;
+        // 새 zoom 레벨 계산 (1~10 범위로 제한)
+        const newZoom = Math.min(Math.max(timeZoom + delta, 1), 10);
+        // zoom 레벨 적용
+        this.onTimeZoomChange(newZoom);
+        // Header의 zoom-slider 값을 업데이트하기 위한 이벤트 발생
+        this.$emit('times-timeZoom-updated', newZoom);
+        return;
+      }
+      
+      // 기존 스크롤 처리 로직
       if (!ev.shiftKey && ev.deltaX === 0) {
         let top = this.state.options.scroll.top + ev.deltaY;
         const chartClientHeight = this.state.options.rowsHeight;

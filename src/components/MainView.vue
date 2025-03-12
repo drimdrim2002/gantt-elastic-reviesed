@@ -49,7 +49,7 @@
             @touchend="chartMouseUp"
             @mousemove="chartMouseMove"
             @touchmove="chartMouseMove"
-            
+            @wheel="chartWheel"
           >
             <chart></chart>
           </div>
