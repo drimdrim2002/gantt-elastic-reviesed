@@ -47,9 +47,9 @@
             @touchstart="chartMouseDown"
             @mouseup="chartMouseUp"
             @touchend="chartMouseUp"
-            @mousemove.prevent="chartMouseMove"
-            @touchmove.prevent="chartMouseMove"
-            @wheel.prevent="chartWheel"
+            @mousemove="chartMouseMove"
+            @touchmove="chartMouseMove"
+            
           >
             <chart></chart>
           </div>
