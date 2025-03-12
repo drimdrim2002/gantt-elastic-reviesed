@@ -36,13 +36,7 @@
         <div
           class="gantt-elastic__header-slider-wrapper"
           :style="{ ...style['header-slider-wrapper'] }"
-          @mouseover="showCustomTooltip = true"
-          @mouseleave="showCustomTooltip = false"
-          ref="sliderWrapper"
         >
-          <div v-if="showCustomTooltip" class="custom-tooltip" :style="customTooltipStyle">
-            Zoom: {{ scale.toFixed(1) }}
-          </div>
           <vue-slider
             class="gantt-elastic__header-slider"
             tooltip="none"
@@ -56,7 +50,6 @@
             :interval="0.1"
             :duration="0"
             width="100px"
-            @input="updateTooltipPosition"
           ></vue-slider>
         </div>
       </label>
@@ -65,11 +58,7 @@
         <div
           class="gantt-elastic__header-slider-wrapper"
           :style="{ ...style['header-slider-wrapper'] }"
-          @mouseover="showYScaleTooltip = true"
-          @mouseleave="showYScaleTooltip = false"
-          ref="ySliderWrapper"
         >
-          <div v-if="showYScaleTooltip" class="custom-tooltip" :style="yScaleTooltipStyle">Height: {{ height }}px</div>
           <vue-slider
             class="gantt-elastic__header-slider"
             tooltip="none"
@@ -80,7 +69,6 @@
             :max="100"
             :min="7"
             width="100px"
-            @input="updateYScaleTooltipPosition"
           ></vue-slider>
         </div>
       </label>
@@ -89,11 +77,7 @@
         <div
           class="gantt-elastic__header-slider-wrapper"
           :style="{ ...style['header-slider-wrapper'] }"
-          @mouseover="showScopeTooltip = true"
-          @mouseleave="showScopeTooltip = false"
-          ref="scopeSliderWrapper"
         >
-          <div v-if="showScopeTooltip" class="custom-tooltip" :style="scopeTooltipStyle">Expand: {{ scope }} days</div>
           <vue-slider
             class="gantt-elastic__header-slider"
             tooltip="none"
@@ -104,7 +88,6 @@
             :max="2"
             :min="0"
             width="100px"
-            @input="updateScopeTooltipPosition"
           ></vue-slider>
         </div>
       </label>
@@ -233,12 +216,6 @@ export default {
       localHeight: 0,
       localBefore: 0,
       localPercent: 0,
-      showCustomTooltip: false,
-      showYScaleTooltip: false,
-      showScopeTooltip: false,
-      tooltipLeft: 0,
-      yTooltipLeft: 0,
-      scopeTooltipLeft: 0,
       sliderOptions: {
         xScale: {
           value: 0
@@ -260,7 +237,6 @@ export default {
     // 마우스 휠로 zoom level이 변경될 때 zoom-slider 값을 업데이트
     this.root.$on('times-timeZoom-updated', (newZoom) => {
       this.localScale = newZoom;
-      this.updateTooltipPosition();
     });
   },
   methods: {
@@ -291,27 +267,6 @@ export default {
       } else {
         this.root.$emit('times-timeZoom-change', parseFloat(value.toFixed(1)));
         this.firstScale = true;
-      }
-    },
-    updateTooltipPosition() {
-      if (this.$refs.sliderWrapper) {
-        const sliderWidth = this.$refs.sliderWrapper.offsetWidth;
-        const percent = (this.scale - this.zoomMin) / (this.zoomMax - this.zoomMin);
-        this.tooltipLeft = percent * sliderWidth;
-      }
-    },
-    updateYScaleTooltipPosition() {
-      if (this.$refs.ySliderWrapper) {
-        const sliderWidth = this.$refs.ySliderWrapper.offsetWidth;
-        const percent = (this.height - 7) / (100 - 7);
-        this.yTooltipLeft = percent * sliderWidth;
-      }
-    },
-    updateScopeTooltipPosition() {
-      if (this.$refs.scopeSliderWrapper) {
-        const sliderWidth = this.$refs.scopeSliderWrapper.offsetWidth;
-        const percent = this.scope / 2; // max가 2이므로 2로 나눔
-        this.scopeTooltipLeft = percent * sliderWidth;
       }
     }
   },
@@ -384,48 +339,6 @@ export default {
         this.localPercent = Number(value);
         this.root.$emit('taskList-width-change', Number(value));
       }
-    },
-    customTooltipStyle() {
-      return {
-        position: 'absolute',
-        left: `${this.tooltipLeft}px`,
-        top: '-25px',
-        backgroundColor: '#42b983',
-        color: 'white',
-        padding: '2px 6px',
-        borderRadius: '3px',
-        fontSize: '12px',
-        transform: 'translateX(-50%)',
-        zIndex: 1000
-      };
-    },
-    yScaleTooltipStyle() {
-      return {
-        position: 'absolute',
-        left: `${this.yTooltipLeft}px`,
-        top: '-25px',
-        backgroundColor: '#42b983',
-        color: 'white',
-        padding: '2px 6px',
-        borderRadius: '3px',
-        fontSize: '12px',
-        transform: 'translateX(-50%)',
-        zIndex: 1000
-      };
-    },
-    scopeTooltipStyle() {
-      return {
-        position: 'absolute',
-        left: `${this.scopeTooltipLeft}px`,
-        top: '-25px',
-        backgroundColor: '#42b983',
-        color: 'white',
-        padding: '2px 6px',
-        borderRadius: '3px',
-        fontSize: '12px',
-        transform: 'translateX(-50%)',
-        zIndex: 1000
-      };
     }
   },
   
@@ -454,29 +367,5 @@ export default {
 
 .gantt-elastic__header-slider-wrapper {
   position: relative;
-}
-
-.custom-tooltip {
-  position: absolute;
-  background-color: #42b983;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 12px;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.custom-tooltip:after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid #42b983;
 }
 </style>
