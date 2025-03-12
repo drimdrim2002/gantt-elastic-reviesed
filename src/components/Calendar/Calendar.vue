@@ -166,7 +166,7 @@ export default {
       const localeName = this.root.state.options.locale.name;
       const firstTime = this.root.state.options.times.firstTime;
       const firstHour = new Date(firstTime).getHours(); // 시작 시간의 시간 부분 추출
-      console.log('firstHour', firstHour);
+      // console.log('firstHour', firstHour);
       
       for (let hourIndex = 0, len = steps.length; hourIndex < len; hourIndex++) {
         const hoursCount = this.howManyHoursFit(hourIndex);
