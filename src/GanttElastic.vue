@@ -1051,12 +1051,17 @@ const GanttElastic = {
     },
 
     /**
-     * Time zoom change event handler
+     * When time zoom changes
+     *
+     * @param {number} timeZoom
      */
     onTimeZoomChange(timeZoom) {
-      this.state.options.times.timeZoom = timeZoom;
+      // 소수점 단위의 timeZoom 값 처리
+      this.state.options.times.timeZoom = parseFloat(parseFloat(timeZoom).toFixed(1));
+      console.log('timeZoom changed to:', this.state.options.times.timeZoom);
       this.recalculateTimes();
       this.calculateSteps();
+      this.computeCalendarWidths();
       this.fixScrollPos();
     },
 
@@ -1119,15 +1124,16 @@ const GanttElastic = {
       let max = this.state.options.times.timeScale * 60;
       let min = this.state.options.times.timeScale;
       let steps = max / min;
-      console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
       
+      // timeZoom을 소수점 단위로 처리
       let percent = this.state.options.times.timeZoom / 100;
-      console.log(`percent: ${percent}`);
       
+      // 소수점 단위의 timeZoom 값을 사용하여 계산
       this.state.options.times.timePerPixel =
-        (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom));
-      this.state.options.times.totalViewDurationMs 
-      = dayjs(this.state.options.times.lastTime).diff(  this.state.options.times.firstTime, 'milliseconds'
+        (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom)) / 2;
+      this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
+        this.state.options.times.firstTime,
+        'milliseconds'
       );
       this.state.options.times.totalViewDurationPx =
         this.state.options.times.totalViewDurationMs / this.state.options.times.timePerPixel;
@@ -1152,9 +1158,6 @@ const GanttElastic = {
         // .endOf('hour')
         // .valueOf();
 
-
-      console.log('this.state.options.times.firstTime', this.state.options.times.firstTime);
-      console.log('this.state.options.times.lastTime', this.state.options.times.lastTime);
       
       this.recalculateTimes();
     },
@@ -1485,7 +1488,6 @@ const GanttElastic = {
      */
     visibleTasks() {
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
-      console.log('visibleTasks',visibleTasks);
       const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
 
       // Group tasks by row

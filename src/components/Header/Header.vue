@@ -41,7 +41,7 @@
           ref="sliderWrapper"
         >
           <div v-if="showCustomTooltip" class="custom-tooltip" :style="customTooltipStyle">
-            Zoom: {{ scale }}
+            Zoom: {{ scale.toFixed(1) }}
           </div>
           <vue-slider
             class="gantt-elastic__header-slider"
@@ -52,7 +52,9 @@
             v-model="scale"
             :max="this.zoomMax"
             :min="this.zoomMin"
-            :step="this.zoomStep"
+            :step="0.1"
+            :interval="0.1"
+            :duration="0"
             width="100px"
             @input="updateTooltipPosition"
           ></vue-slider>
@@ -277,11 +279,11 @@ export default {
       // debouncing
       if (this.firstScale) {
         this.scaleTimeoutId = setTimeout(() => {
-          this.root.$emit('times-timeZoom-change', value);
+          this.root.$emit('times-timeZoom-change', parseFloat(value.toFixed(1)));
           this.scaleTimeoutId = null;
         }, 50);
       } else {
-        this.root.$emit('times-timeZoom-change', value);
+        this.root.$emit('times-timeZoom-change', parseFloat(value.toFixed(1)));
         this.firstScale = true;
       }
     },
@@ -346,7 +348,7 @@ export default {
         return this.localScale;
       },
       set(value) {
-        this.localScale = Number(value);
+        this.localScale = parseFloat(value.toFixed(1));
         this.setScale(this.localScale);
       }
     },
