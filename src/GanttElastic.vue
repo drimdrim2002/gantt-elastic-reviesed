@@ -1119,18 +1119,15 @@ const GanttElastic = {
       let max = this.state.options.times.timeScale * 60;
       let min = this.state.options.times.timeScale;
       let steps = max / min;
+      console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
       
       let percent = this.state.options.times.timeZoom / 100;
-      // console.log(`max: ${max}, min: ${min}, steps: ${steps}`);
-      // console.log(`percent: ${percent}`);
+      console.log(`percent: ${percent}`);
       
-      const applyScale = 1;
       this.state.options.times.timePerPixel =
-        (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom)) 
-        / applyScale;
-      this.state.options.times.totalViewDurationMs = dayjs(this.state.options.times.lastTime).diff(
-        this.state.options.times.firstTime,
-        'milliseconds'
+        (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom));
+      this.state.options.times.totalViewDurationMs 
+      = dayjs(this.state.options.times.lastTime).diff(  this.state.options.times.firstTime, 'milliseconds'
       );
       this.state.options.times.totalViewDurationPx =
         this.state.options.times.totalViewDurationMs / this.state.options.times.timePerPixel;
@@ -1142,18 +1139,23 @@ const GanttElastic = {
      * Initialize time variables
      */
     initTimes() {
-      this.state.options.times.firstTime = dayjs(this.state.options.times.firstTaskTime)
-        .locale(this.state.options.locale.name)
-        .startOf('day')
-        .subtract(this.state.options.scope.before, 'days')
-        .startOf('day')
-        .valueOf();
-      this.state.options.times.lastTime = dayjs(this.state.options.times.lastTaskTime)
-        .locale(this.state.options.locale.name)
-        .endOf('day')
-        .add(this.state.options.scope.after, 'days')
-        .endOf('day')
-        .valueOf();
+      // this.state.options.times.firstTime = dayjs(this.state.options.times.firstTaskTime)
+        // .locale(this.state.options.locale.name)
+        // .startOf('hour')
+        // .subtract(this.state.options.scope.before, 'hour')
+        // .startOf('hour')
+        // .valueOf();
+      // this.state.options.times.lastTime = dayjs(this.state.options.times.lastTaskTime)
+        // .locale(this.state.options.locale.name)
+        // .endOf('hour')
+        // .add(this.state.options.scope.after, 'hour')
+        // .endOf('hour')
+        // .valueOf();
+
+
+      console.log('this.state.options.times.firstTime', this.state.options.times.firstTime);
+      console.log('this.state.options.times.lastTime', this.state.options.times.lastTime);
+      
       this.recalculateTimes();
     },
 
@@ -1176,7 +1178,7 @@ const GanttElastic = {
       for (
         let currentDate = dayjs(this.state.options.times.firstTime)
           .add(1, this.state.options.times.stepDuration)
-          .startOf('day');
+          .startOf('hour');
         currentDate.valueOf() <= lastMs;
         currentDate = currentDate.add(1, this.state.options.times.stepDuration).startOf('day')
       ) {
@@ -1302,7 +1304,7 @@ const GanttElastic = {
             maxWidths[formatName] = widths[formatName];
           }
         });
-        currentDate = currentDate.add(1, 'day');
+        currentDate = currentDate.add(1, 'hour');
       }
     },
 
@@ -1383,18 +1385,18 @@ const GanttElastic = {
       }
       this.state.options.times.firstTaskTime = firstTaskTime;
       this.state.options.times.lastTaskTime = lastTaskTime;
-      this.state.options.times.firstTime = dayjs(firstTaskTime)
-        .locale(this.state.options.locale.name)
-        .startOf('day')
-        .subtract(this.state.options.scope.before, 'days')
-        .startOf('day')
-        .valueOf();
-      this.state.options.times.lastTime = dayjs(lastTaskTime)
-        .locale(this.state.options.locale.name)
-        .endOf('day')
-        .add(this.state.options.scope.after, 'days')
-        .endOf('day')
-        .valueOf();
+      // this.state.options.times.firstTime = dayjs(firstTaskTime)
+      //   .locale(this.state.options.locale.name)
+      //   .startOf('hour')
+      //   .subtract(this.state.options.scope.before, 'hour')
+      //   .startOf('hour')
+      //   .valueOf();
+      // this.state.options.times.lastTime = dayjs(lastTaskTime)
+      //   .locale(this.state.options.locale.name)
+      //   .endOf('hour')
+      //   .add(this.state.options.scope.after, 'hour')
+      //   .endOf('hour')
+      //   .valueOf();
     },
 
     /**
@@ -1409,7 +1411,7 @@ const GanttElastic = {
       this.state.options.taskList.width = this.state.options.taskList.columns.reduce(
         (prev, current) => {
           return { width: prev.width + current.width };
-        },
+        }, 
         { width: 0 }
       ).width;
     },
@@ -1483,6 +1485,7 @@ const GanttElastic = {
      */
     visibleTasks() {
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
+      console.log('visibleTasks',visibleTasks);
       const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
 
       // Group tasks by row

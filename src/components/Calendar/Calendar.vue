@@ -161,7 +161,13 @@ export default {
         return allHours;
       }
       const steps = this.root.state.options.times.steps;
+      // console.log('steps', steps);
+      
       const localeName = this.root.state.options.locale.name;
+      const firstTime = this.root.state.options.times.firstTime;
+      const firstHour = new Date(firstTime).getHours(); // 시작 시간의 시간 부분 추출
+      console.log('firstHour', firstHour);
+      
       for (let hourIndex = 0, len = steps.length; hourIndex < len; hourIndex++) {
         const hoursCount = this.howManyHoursFit(hourIndex);
         if (hoursCount.count === 0) {
@@ -171,7 +177,7 @@ export default {
         const hourStep = 24 / hoursCount.count;
         const hourWidthPx = steps[hourIndex].width.px / hoursCount.count;
         for (let i = 0, len = hoursCount.count; i < len; i++) {
-          const hour = i * hourStep;
+          const hour = (i * hourStep + firstHour) % 24; // 시작 시간을 기준으로 시간 계산
           let index = hourIndex;
           if (hourIndex > 0) {
             index = hourIndex - Math.floor(hourIndex / 24) * 24;
