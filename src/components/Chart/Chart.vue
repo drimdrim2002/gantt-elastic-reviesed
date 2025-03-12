@@ -169,7 +169,7 @@ export default {
      * 선택 상태 완전 초기화
      */
     clearAllSelections() {
-      console.log('Clearing all selections');
+      // console.log('Clearing all selections');
       // 마지막 선택 task 초기화
       this.lastSelectedTaskId = null;
 

@@ -281,10 +281,10 @@ export default {
         }
 
         // 디버깅용: 첫 번째 task의 정보를 콘솔에 출력
-        if (selectedTasks.length > 0) {
-          const firstTask = selectedTasks[0];
-          console.log(`드래그 중: task.y=${firstTask.y}, task.height=${firstTask.height}, row=${firstTask.row}`);
-        }
+        // if (selectedTasks.length > 0) {
+        //   const firstTask = selectedTasks[0];
+        //   console.log(`드래그 중: task.y=${firstTask.y}, task.height=${firstTask.height}, row=${firstTask.row}`);
+        // }
 
         // 선택된 모든 task 이동
         selectedTasks.forEach(selectedTask => {
