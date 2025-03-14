@@ -255,6 +255,9 @@ export default {
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
 
+      // 드래그 상태 설정
+      this.root.state.isDragging = true;
+
       // 선택된 tasks를 상위 스코프에서 정의
       const selectedTasks = this.root.state.selectedTasks || [];
 
@@ -309,6 +312,8 @@ export default {
 
         // 드래그 상태 해제
         this.isDragging = false;
+        // 전역 드래그 상태 해제
+        this.root.state.isDragging = false;
 
         // 실제 드래그 이동이 없었으면 원래 위치로 복원하고 종료
         if (!this.hasMoved) {

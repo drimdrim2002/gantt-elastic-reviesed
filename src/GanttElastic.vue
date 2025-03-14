@@ -466,6 +466,7 @@ const GanttElastic = {
         selectedTasks: [], // 선택된 작업 목록
         tasksById: {}, // ID로 작업을 빠르게 조회하기 위한 맵
         taskTree: {}, // 작업의 계층 구조를 저장하는 트리
+        isDragging: false, // 드래그 중인지 여부를 추적하는 플래그
 
         // 2. 옵션 및 스타일
         options: {
@@ -951,6 +952,11 @@ const GanttElastic = {
      * @param {number} top
      */
     _onScrollChart(left, top) {
+      // 드래그 중이면 스크롤 이벤트 무시
+      if (this.state.isDragging) {
+        return;
+      }
+
       if (this.state.options.scroll.chart.left === left && this.state.options.scroll.chart.top === top) {
         return;
       }
@@ -1017,6 +1023,13 @@ const GanttElastic = {
      * Mouse wheel event handler
      */
     onWheelChart(ev) {
+      // 드래그 중이면 이벤트 무시
+      if (this.state.isDragging) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        return;
+      }
+
       // Ctrl 키를 누른 상태에서 마우스 휠을 사용하면 zoom 조절
       if (ev.ctrlKey) {
         ev.preventDefault();
@@ -1169,11 +1182,11 @@ const GanttElastic = {
       // .startOf('hour')
       // .valueOf();
       // this.state.options.times.lastTime = dayjs(this.state.options.times.lastTaskTime)
-      // .locale(this.state.options.locale.name)
-      // .endOf('hour')
-      // .add(this.state.options.scope.after, 'hour')
-      // .endOf('hour')
-      // .valueOf();
+      //   .locale(this.state.options.locale.name)
+      //   .endOf('hour')
+      //   .add(this.state.options.scope.after, 'hour')
+      //   .endOf('hour')
+      //   .valueOf();
 
       this.recalculateTimes();
     },
@@ -1702,6 +1715,37 @@ const GanttElastic = {
 
     this.$on('task-moved', tasks => {
       console.log(`Task moved: ${JSON.stringify(tasks)}`);
+
+      // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
+      // const rowTasks = {};
+
+      // // 현재 row의 모든 task 수집
+      // this.root.visibleTasks.forEach(task => {
+      //   if (!rowTasks[task.row]) {
+      //     rowTasks[task.row] = [];
+      //   }
+      //   rowTasks[task.row].push(task);
+      // });
+
+      // // 각 row의 task들을 x 좌표로 정렬
+
+      // Object.keys(rowTasks).forEach(row => {
+      //   const tasks = rowTasks[row];
+      //   tasks.sort((a, b) => a.x - b.x);
+
+      //   // 겹침 방지
+      //   for (let i = 1; i < tasks.length; i++) {
+      //     const prevTask = tasks[i - 1];
+      //     const currentTask = tasks[i];
+      //     const minGap = 30; // 최소 간격 (픽셀)
+
+      //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
+      //       currentTask.x = prevTask.x + prevTask.width + minGap;
+      //       // 시간 정보도 업데이트
+      //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
+      //     }
+      //   }
+      // });
     });
   },
 
