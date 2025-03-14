@@ -336,12 +336,6 @@ export default {
           return;
         }
 
-        // 마우스를 놓았을 때 가장 가까운 row에 배치
-        const rowHeight =
-          this.root.state.options.row.height +
-          (this.root.state.options.calendar.gap || 0) +
-          (this.root.state.options.chart.grid.horizontal.gap || 0);
-
         // 디버깅용: rowHeight 구성요소 출력
         // console.log('Row 높이 계산:', {
         //   'row.height': this.root.state.options.row.height,
@@ -350,50 +344,25 @@ export default {
         //   total: rowHeight
         // });
 
-        const maxRows = 200;
-
-        const boundaries = [];
-        for (let i = 0; i < maxRows; i++) {
-          const minY = i * rowHeight - rowHeight / 2;
-          const maxY = i * rowHeight + rowHeight / 2;
-          boundaries.push({
-            row: i,
-            min: minY,
-            max: maxY
-          });
-        }
-
         // 1. 먼저 각 task의 row 계산
+        const rowIndexByTaskId = {};
         selectedTasks.forEach(selectedTask => {
-          console.log(`task 배치 전: x=${selectedTask.x}, y=${selectedTask.y}, row=${selectedTask.row}`);
+          console.log(`task 배치 전: `);
+          console.dir(selectedTask);
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
-          let rowIndex = Math.round(selectedTask.y / rowHeight);
+          let rowIndex = -1;
 
-          for (let boundary of boundaries) {
-            console.log('boundary', boundary);
+          for (let boundary of selectedTask.rowBoundaries) {
             if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
               rowIndex = boundary.row;
               break;
             }
           }
 
-          // row의 시작 y 좌표 계산
-          const rowStartY = rowIndex * rowHeight;
-
-          // task의 높이 (SVG 높이)
-          const taskHeight = 24; // SVG 높이
-
-          // row의 중앙에 task 배치
-          // row 시작 위치 + (row 높이 - task 높이) / 2
-          const centerY = rowStartY + (this.root.state.options.row.height - taskHeight) / 2;
-
-          // task 위치 업데이트
-          selectedTask.y = centerY;
-          selectedTask.row = rowIndex;
-
-          console.log(`task 배치 후후: x=${selectedTask.x}, y=${selectedTask.y}, row=${selectedTask.row}`);
-
+          selectedTask.y = selectedTask.originYByRowIndex[rowIndex];
+          console.log(`task 배치 후후: `);
+          console.dir(selectedTask);
         });
 
         // 드래그 완료 위치 정보 계산 (첫 번째 선택된 task 기준)
@@ -404,14 +373,11 @@ export default {
           const dropTime = new Date(firstTask.start);
           const formattedTime = dropTime.toLocaleTimeString();
 
-          // 2. Row 계산
-          const dropRow = firstTask.row;
-
           // 3. Alert 메시지 표시
-          alert(`Task를 다음 위치로 이동했습니다:\n시간: ${formattedTime}\nRow: ${dropRow}`);
+          alert(`Task를 다음 위치로 이동했습니다:\n시간: ${formattedTime}`);
         }
 
-        // // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
+        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
         // const rowTasks = {};
 
         // // 현재 row의 모든 task 수집
@@ -423,6 +389,7 @@ export default {
         // });
 
         // // 각 row의 task들을 x 좌표로 정렬
+
         // Object.keys(rowTasks).forEach(row => {
         //   const tasks = rowTasks[row];
         //   tasks.sort((a, b) => a.x - b.x);
@@ -431,7 +398,7 @@ export default {
         //   for (let i = 1; i < tasks.length; i++) {
         //     const prevTask = tasks[i - 1];
         //     const currentTask = tasks[i];
-        //     const minGap = 10; // 최소 간격 (픽셀)
+        //     const minGap = 30; // 최소 간격 (픽셀)
 
         //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
         //       currentTask.x = prevTask.x + prevTask.width + minGap;

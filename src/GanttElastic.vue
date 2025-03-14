@@ -462,39 +462,39 @@ const GanttElastic = {
     return {
       state: {
         // 1. 작업 관련 데이터
-        tasks: [],           // 모든 작업 목록
-        selectedTasks: [],   // 선택된 작업 목록
-        tasksById: {},       // ID로 작업을 빠르게 조회하기 위한 맵
-        taskTree: {},        // 작업의 계층 구조를 저장하는 트리
+        tasks: [], // 모든 작업 목록
+        selectedTasks: [], // 선택된 작업 목록
+        tasksById: {}, // ID로 작업을 빠르게 조회하기 위한 맵
+        taskTree: {}, // 작업의 계층 구조를 저장하는 트리
 
         // 2. 옵션 및 스타일
         options: {
-          scrollBarHeight: 0,        // 스크롤바 높이
-          allVisibleTasksHeight: 0,  // 모든 보이는 작업의 총 높이
-          outerHeight: 0,            // 외부 컨테이너 높이
+          scrollBarHeight: 0, // 스크롤바 높이
+          allVisibleTasksHeight: 0, // 모든 보이는 작업의 총 높이
+          outerHeight: 0, // 외부 컨테이너 높이
           scroll: {
-            left: 0,                 // 가로 스크롤 위치
-            top: 0                   // 세로 스크롤 위치
+            left: 0, // 가로 스크롤 위치
+            top: 0 // 세로 스크롤 위치
           }
         },
-        dynamicStyle: {},           // 동적 스타일 설정
+        dynamicStyle: {}, // 동적 스타일 설정
 
         // 3. 참조 및 컨텍스트
-        refs: {},                   // DOM 요소 참조 저장
-        ctx,                        // 캔버스 컨텍스트 (텍스트 측정용)
+        refs: {}, // DOM 요소 참조 저장
+        ctx, // 캔버스 컨텍스트 (텍스트 측정용)
 
         // 4. 상태 제어 플래그
-        emitTasksChanges: true,     // 작업 변경 이벤트 발생 여부
-        emitOptionsChanges: true,   // 옵션 변경 이벤트 발생 여부
+        emitTasksChanges: true, // 작업 변경 이벤트 발생 여부
+        emitOptionsChanges: true, // 옵션 변경 이벤트 발생 여부
 
         // 5. 리소스 관리
-        resizeObserver: null,       // 크기 변경 감지기
-        unwatchTasks: null,         // 작업 감시자 해제 함수
-        unwatchOptions: null,       // 옵션 감시자 해제 함수
-        unwatchStyle: null,         // 스타일 감시자 해제 함수
-        unwatchOutputTasks: null,   // 출력 작업 감시자 해제 함수
+        resizeObserver: null, // 크기 변경 감지기
+        unwatchTasks: null, // 작업 감시자 해제 함수
+        unwatchOptions: null, // 옵션 감시자 해제 함수
+        unwatchStyle: null, // 스타일 감시자 해제 함수
+        unwatchOutputTasks: null, // 출력 작업 감시자 해제 함수
         unwatchOutputOptions: null, // 출력 옵션 감시자 해제 함수
-        unwatchOutputStyle: null    // 출력 스타일 감시자 해제 함수
+        unwatchOutputStyle: null // 출력 스타일 감시자 해제 함수
       }
     };
   },
@@ -1032,7 +1032,7 @@ const GanttElastic = {
         this.$emit('times-timeZoom-updated', newZoom);
         return;
       }
-      
+
       // 기존 스크롤 처리 로직
       if (!ev.shiftKey && ev.deltaX === 0) {
         let top = this.state.options.scroll.top + ev.deltaY;
@@ -1141,10 +1141,10 @@ const GanttElastic = {
       let max = this.state.options.times.timeScale * 60;
       let min = this.state.options.times.timeScale;
       let steps = max / min;
-      
+
       // timeZoom을 소수점 단위로 처리
       let percent = this.state.options.times.timeZoom / 100;
-      
+
       // 소수점 단위의 timeZoom 값을 사용하여 계산
       this.state.options.times.timePerPixel =
         (this.state.options.times.timeScale * steps * percent + Math.pow(2, this.state.options.times.timeZoom)) / 2;
@@ -1163,19 +1163,18 @@ const GanttElastic = {
      */
     initTimes() {
       // this.state.options.times.firstTime = dayjs(this.state.options.times.firstTaskTime)
-        // .locale(this.state.options.locale.name)
-        // .startOf('hour')
-        // .subtract(this.state.options.scope.before, 'hour')
-        // .startOf('hour')
-        // .valueOf();
+      // .locale(this.state.options.locale.name)
+      // .startOf('hour')
+      // .subtract(this.state.options.scope.before, 'hour')
+      // .startOf('hour')
+      // .valueOf();
       // this.state.options.times.lastTime = dayjs(this.state.options.times.lastTaskTime)
-        // .locale(this.state.options.locale.name)
-        // .endOf('hour')
-        // .add(this.state.options.scope.after, 'hour')
-        // .endOf('hour')
-        // .valueOf();
+      // .locale(this.state.options.locale.name)
+      // .endOf('hour')
+      // .add(this.state.options.scope.after, 'hour')
+      // .endOf('hour')
+      // .valueOf();
 
-      
       this.recalculateTimes();
     },
 
@@ -1274,22 +1273,22 @@ const GanttElastic = {
       const style = { ...this.style['calendar-row-text'], ...this.style['calendar-row-text--day'] };
       this.state.ctx.font = style['font-size'] + ' ' + style['font-family'];
       const localeName = this.state.options.locale.name;
-      
+
       // steps가 비어있는 경우 처리
       if (this.state.options.times.steps.length === 0) {
         let maxWidths = this.state.options.calendar.day.maxWidths;
         this.state.options.calendar.day.widths = [];
-        
+
         // maxWidths가 객체가 아니거나 비어있는 경우 초기화
         if (typeof maxWidths !== 'object' || Object.keys(maxWidths).length === 0) {
           maxWidths = { short: 0, medium: 0, long: 0 };
           this.state.options.calendar.day.maxWidths = maxWidths;
         }
-        
+
         // 현재 날짜를 사용하여 너비 계산
         const currentDate = dayjs();
         const widths = { day: 0 };
-        
+
         Object.keys(this.state.options.calendar.day.format).forEach(formatName => {
           maxWidths[formatName] = 0;
           widths[formatName] = this.state.ctx.measureText(
@@ -1297,11 +1296,11 @@ const GanttElastic = {
           ).width;
           maxWidths[formatName] = widths[formatName];
         });
-        
+
         this.state.options.calendar.day.widths.push(widths);
         return;
       }
-      
+
       // 일반적인 경우 처리
       let currentDate = dayjs(this.state.options.times.steps[0].time).locale(localeName);
       let maxWidths = this.state.options.calendar.day.maxWidths;
@@ -1431,7 +1430,7 @@ const GanttElastic = {
       this.state.options.taskList.width = this.state.options.taskList.columns.reduce(
         (prev, current) => {
           return { width: prev.width + current.width };
-        }, 
+        },
         { width: 0 }
       ).width;
     },
@@ -1494,6 +1493,35 @@ const GanttElastic = {
           count: this.state.selectedTasks.length
         });
       });
+    },
+
+    getOriginYByRowIndex(_visibleTasks) {
+      const originYByRowIndex = {};
+      _visibleTasks.forEach(task => {
+        if (!originYByRowIndex[task.row]) {
+          originYByRowIndex[task.row] = task.y;
+        }
+      });
+      return originYByRowIndex;
+    },
+
+    getRowBoundaries(_maxRow) {
+      const rowHeight =
+        this.state.options.row.height +
+        (this.state.options.calendar.gap || 0) +
+        (this.state.options.chart.grid.horizontal.gap || 0);
+
+      const boundaries = [];
+      for (let i = 0; i < _maxRow; i++) {
+        const minY = i * rowHeight - rowHeight / 2;
+        const maxY = i * rowHeight + rowHeight / 2;
+        boundaries.push({
+          row: i,
+          min: minY,
+          max: maxY
+        });
+      }
+      return boundaries;
     }
   },
 
@@ -1531,6 +1559,11 @@ const GanttElastic = {
       this.state.options.outerHeight = this.getHeight(totalRows, true) - heightCompensation;
 
       let len = visibleTasks.length;
+
+      const originYByRowIndex = this.getOriginYByRowIndex(visibleTasks);
+      const maxRow = Object.keys(originYByRowIndex).length;
+      const rowBoundaries = this.getRowBoundaries(maxRow);
+
       for (let index = 0; index < len; index++) {
         let task = visibleTasks[index];
         task.width =
@@ -1543,7 +1576,12 @@ const GanttElastic = {
         task.y =
           (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * task.row +
           this.state.options.chart.grid.horizontal.gap;
+
+        task.maxRows = maxRow;
+        task.originYByRowIndex = originYByRowIndex;
+        task.rowBoundaries = rowBoundaries;
       }
+
       return visibleTasks;
     },
 

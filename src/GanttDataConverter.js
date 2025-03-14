@@ -20,7 +20,7 @@ export const convertToInput = async function(_input) {
     _input.filteredRouteDetailList.forEach(routeDetailRow => {
         const {routeId, vhclId, stopSeqNo, order, arrDtm, depDetm, taskPeridVal} = routeDetailRow;
 
-        const id = `${vhclId}-${stopSeqNo}`;
+        const id = `${routeId}-${vhclId}-${stopSeqNo}`;
         markerId.push(id);
         const label = stopSeqNo;
         const  startTime = new Date(arrDtm).getTime();
@@ -31,7 +31,7 @@ export const convertToInput = async function(_input) {
         const dependentOn = [];
         if (parseInt(stopSeqNo) > 0) {
             const prevStopSeqNo = parseInt(stopSeqNo) - 1;
-            const prevId = `${vhclId}-${prevStopSeqNo}`;
+            const prevId = `${routeId}-${vhclId}-${prevStopSeqNo}`;
             if (markerId.includes(prevId)) {
                 dependentOn.push(prevId);
             }
@@ -63,7 +63,7 @@ export const convertToInput = async function(_input) {
     })
 
 
-    return [ganttInfoArray, popupInfo];
+    return [ganttInfoArray, popupInfo, _input['planVo']];
     
 
     
