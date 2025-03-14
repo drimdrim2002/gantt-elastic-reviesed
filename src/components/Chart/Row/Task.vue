@@ -280,12 +280,6 @@ export default {
           this.hasMoved = true;
         }
 
-        // 디버깅용: 첫 번째 task의 정보를 콘솔에 출력
-        // if (selectedTasks.length > 0) {
-        //   const firstTask = selectedTasks[0];
-        //   console.log(`드래그 중: task.y=${firstTask.y}, task.height=${firstTask.height}, row=${firstTask.row}`);
-        // }
-
         // 선택된 모든 task 이동
         selectedTasks.forEach(selectedTask => {
           // 새로운 위치 계산
@@ -336,83 +330,37 @@ export default {
           return;
         }
 
-        // 디버깅용: rowHeight 구성요소 출력
-        // console.log('Row 높이 계산:', {
-        //   'row.height': this.root.state.options.row.height,
-        //   'calendar.gap': this.root.state.options.calendar.gap || 0,
-        //   'grid.horizontal.gap': this.root.state.options.chart.grid.horizontal.gap || 0,
-        //   total: rowHeight
-        // });
-
+        const fromRow = this.originalPositions[0].row;
+        let toRow = -1;
         // 1. 먼저 각 task의 row 계산
-        const rowIndexByTaskId = {};
         selectedTasks.forEach(selectedTask => {
           console.log(`task 배치 전: `);
           console.dir(selectedTask);
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
-          let rowIndex = -1;
 
           for (let boundary of selectedTask.rowBoundaries) {
             if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
-              rowIndex = boundary.row;
+              toRow = boundary.row;
               break;
             }
           }
 
-          selectedTask.y = selectedTask.originYByRowIndex[rowIndex];
+          selectedTask.y = selectedTask.originYByRowIndex[toRow];
           console.log(`task 배치 후후: `);
           console.dir(selectedTask);
         });
-
-        // 드래그 완료 위치 정보 계산 (첫 번째 선택된 task 기준)
-        if (selectedTasks.length > 0) {
-          const firstTask = selectedTasks[0];
-
-          // 1. 시간 계산
-          const dropTime = new Date(firstTask.start);
-          const formattedTime = dropTime.toLocaleTimeString();
-
-          // 3. Alert 메시지 표시
-          alert(`Task를 다음 위치로 이동했습니다:\n시간: ${formattedTime}`);
-        }
-
-        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
-        // const rowTasks = {};
-
-        // // 현재 row의 모든 task 수집
-        // this.root.visibleTasks.forEach(task => {
-        //   if (!rowTasks[task.row]) {
-        //     rowTasks[task.row] = [];
-        //   }
-        //   rowTasks[task.row].push(task);
-        // });
-
-        // // 각 row의 task들을 x 좌표로 정렬
-
-        // Object.keys(rowTasks).forEach(row => {
-        //   const tasks = rowTasks[row];
-        //   tasks.sort((a, b) => a.x - b.x);
-
-        //   // 겹침 방지
-        //   for (let i = 1; i < tasks.length; i++) {
-        //     const prevTask = tasks[i - 1];
-        //     const currentTask = tasks[i];
-        //     const minGap = 30; // 최소 간격 (픽셀)
-
-        //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
-        //       currentTask.x = prevTask.x + prevTask.width + minGap;
-        //       // 시간 정보도 업데이트
-        //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
-        //     }
-        //   }
-        // });
 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
         // 올바른 이벤트 이름으로 변경
-        this.$emit('chart-task-taskDragEnd', { tasks: selectedTasks, event: e });
+        this.$emit('chart-task-taskDragEnd', {
+          selectedTasks: selectedTasks,
+          event: e,
+          fromRow: fromRow,
+          toRow: toRow
+        });
 
         // 드래그 완료 후 선택 초기화
         setTimeout(() => {

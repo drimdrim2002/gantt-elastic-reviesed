@@ -1699,6 +1699,10 @@ const GanttElastic = {
     this.$root.$emit('gantt-elastic-mounted', this);
     this.$emit('mounted', this);
     this.$root.$emit('gantt-elastic-ready', this);
+
+    this.$on('task-moved', tasks => {
+      console.log(`Task moved: ${JSON.stringify(tasks)}`);
+    });
   },
 
   /**

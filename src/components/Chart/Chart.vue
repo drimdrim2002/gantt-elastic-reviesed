@@ -94,7 +94,7 @@ export default {
     Calendar,
     Task,
     Milestone,
-    Project,
+    Project
     // DaysHighlight
   },
   inject: ['root'],
@@ -152,8 +152,8 @@ export default {
     onTaskDragging(event) {
       this.root.$emit('task-dragging', event.tasks || event.task);
     },
-    onTaskDragEnd(event) {
-      this.root.$emit('task-moved', event.tasks || event.task);
+    onTaskDragEnd(_moveParams) {
+      this.root.$emit('task-moved', _moveParams);
     },
     /**
      * 전역 키보드 이벤트 처리
