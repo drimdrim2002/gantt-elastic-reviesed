@@ -266,7 +266,8 @@ export default {
         id: task.id,
         x: task.x,
         y: task.y,
-        start: task.start
+        start: task.start,
+        row: task.row
       }));
 
       const onMouseMove = e => {
@@ -335,6 +336,7 @@ export default {
           return;
         }
 
+        console.log(`this.originalPositions`, this.originalPositions);
         const fromRow = this.originalPositions[0].row;
         let toRow = -1;
         // 1. 먼저 각 task의 row 계산
