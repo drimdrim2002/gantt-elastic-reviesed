@@ -267,7 +267,8 @@ export default {
         x: task.x,
         y: task.y,
         start: task.start,
-        row: task.row
+        row: task.row,
+        vhclId: task.vhclId
       }));
 
       const onMouseMove = e => {
@@ -337,12 +338,11 @@ export default {
         }
 
         console.log(`this.originalPositions`, this.originalPositions);
-        const fromRow = this.originalPositions[0].row;
         let toRow = -1;
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
-          console.log(`task 배치 전: `);
-          console.dir(selectedTask);
+          // console.log(`task 배치 전: `);
+          // console.dir(selectedTask);
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
 
@@ -354,8 +354,8 @@ export default {
           }
 
           selectedTask.y = selectedTask.originYByRowIndex[toRow];
-          console.log(`task 배치 후후: `);
-          console.dir(selectedTask);
+          // console.log(`task 배치 후후: `);
+          // console.dir(selectedTask);
         });
 
         document.removeEventListener('mousemove', onMouseMove);
@@ -365,7 +365,7 @@ export default {
         this.$emit('chart-task-taskDragEnd', {
           selectedTasks: selectedTasks,
           event: e,
-          fromRow: fromRow,
+          originalTasks: this.originalPositions,
           toRow: toRow
         });
 

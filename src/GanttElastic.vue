@@ -495,7 +495,8 @@ const GanttElastic = {
         unwatchStyle: null, // 스타일 감시자 해제 함수
         unwatchOutputTasks: null, // 출력 작업 감시자 해제 함수
         unwatchOutputOptions: null, // 출력 옵션 감시자 해제 함수
-        unwatchOutputStyle: null // 출력 스타일 감시자 해제 함수
+        unwatchOutputStyle: null, // 출력 스타일 감시자 해제 함수,
+        taskByVhclId: {} // 차량 기준으로 작업 목록 저장장
       }
     };
   },
@@ -642,6 +643,7 @@ const GanttElastic = {
       this.state.tasksById = this.resetTaskTree(tasks);
       this.state.taskTree = this.makeTaskTree(this.state.rootTask, tasks);
       this.state.tasks = this.state.taskTree.allChildren.map(childId => this.getTask(childId));
+      this.state.taskByVhclId = this.makeTaskByVhclId();
       this.calculateTaskListColumnsDimensions();
       this.state.options.scrollBarHeight = this.getScrollBarHeight();
       this.state.options.outerHeight = this.state.options.height + this.state.options.scrollBarHeight;
@@ -777,6 +779,17 @@ const GanttElastic = {
         }
       }
       return task;
+    },
+    makeTaskByVhclId() {
+      const taskByVhclId = {};
+      this.tasks.forEach(task => {
+        const vhclId = task.vhclId;
+        if (!taskByVhclId[vhclId]) {
+          taskByVhclId[vhclId] = [];
+        }
+        taskByVhclId[vhclId].push(task);
+      });
+      return taskByVhclId;
     },
 
     /**
@@ -1145,6 +1158,7 @@ const GanttElastic = {
       this.$on('scope-change', this.onScopeChange);
       this.$on('taskList-width-change', this.onTaskListWidthChange);
       this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange);
+      this.$on('task-moved', this.onTaskMoved);
     },
 
     /**
@@ -1535,6 +1549,45 @@ const GanttElastic = {
         });
       }
       return boundaries;
+    },
+    onTaskMoved(tasks) {
+      console.log('onTaskMoved start');
+
+      const { originalTasks, toRow, selectedTasks } = tasks;
+      console.log(
+        `originalTasks: ${JSON.stringify(originalTasks)}, toRow: ${toRow}
+        , selectedTaks: ${JSON.stringify(selectedTasks)}`
+      );
+
+      tasks => {
+        // visible task에서 from row 에 해당하는 task를 가져온다.
+        // 여기서 selected task에 포함된 것을 지운다.
+        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
+        // const rowTasks = {};
+        // // 현재 row의 모든 task 수집
+        // this.root.visibleTasks.forEach(task => {
+        //   if (!rowTasks[task.row]) {
+        //     rowTasks[task.row] = [];
+        //   }
+        //   rowTasks[task.row].push(task);
+        // });
+        // // 각 row의 task들을 x 좌표로 정렬
+        // Object.keys(rowTasks).forEach(row => {
+        //   const tasks = rowTasks[row];
+        //   tasks.sort((a, b) => a.x - b.x);
+        //   // 겹침 방지
+        //   for (let i = 1; i < tasks.length; i++) {
+        //     const prevTask = tasks[i - 1];
+        //     const currentTask = tasks[i];
+        //     const minGap = 30; // 최소 간격 (픽셀)
+        //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
+        //       currentTask.x = prevTask.x + prevTask.width + minGap;
+        //       // 시간 정보도 업데이트
+        //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
+        //     }
+        //   }
+        // });
+      };
     }
   },
 
@@ -1545,6 +1598,8 @@ const GanttElastic = {
      * For example when task is collapsed - children of this task are not visible - we should not render them
      */
     visibleTasks() {
+      console.log('visibleTasks computed start');
+
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
       const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
 
@@ -1594,6 +1649,8 @@ const GanttElastic = {
         task.originYByRowIndex = originYByRowIndex;
         task.rowBoundaries = rowBoundaries;
       }
+
+      console.log('visibleTasks computed end');
 
       return visibleTasks;
     },
@@ -1702,6 +1759,8 @@ const GanttElastic = {
    * Emit ready/mounted events and deliver this gantt instance to outside world when needed
    */
   mounted() {
+    console.log('gantt elastic mounted start');
+
     this.state.options.clientWidth = this.$el.clientWidth;
     this.state.resizeObserver = new ResizeObserver((entries, observer) => {
       this.globalOnResize();
@@ -1713,40 +1772,7 @@ const GanttElastic = {
     this.$emit('mounted', this);
     this.$root.$emit('gantt-elastic-ready', this);
 
-    this.$on('task-moved', tasks => {
-      console.log(`Task moved: ${JSON.stringify(tasks)}`);
-
-      // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
-      // const rowTasks = {};
-
-      // // 현재 row의 모든 task 수집
-      // this.root.visibleTasks.forEach(task => {
-      //   if (!rowTasks[task.row]) {
-      //     rowTasks[task.row] = [];
-      //   }
-      //   rowTasks[task.row].push(task);
-      // });
-
-      // // 각 row의 task들을 x 좌표로 정렬
-
-      // Object.keys(rowTasks).forEach(row => {
-      //   const tasks = rowTasks[row];
-      //   tasks.sort((a, b) => a.x - b.x);
-
-      //   // 겹침 방지
-      //   for (let i = 1; i < tasks.length; i++) {
-      //     const prevTask = tasks[i - 1];
-      //     const currentTask = tasks[i];
-      //     const minGap = 30; // 최소 간격 (픽셀)
-
-      //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
-      //       currentTask.x = prevTask.x + prevTask.width + minGap;
-      //       // 시간 정보도 업데이트
-      //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
-      //     }
-      //   }
-      // });
-    });
+    console.log('gantt elastic mounted end');
   },
 
   /**
