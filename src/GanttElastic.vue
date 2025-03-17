@@ -111,7 +111,7 @@ function getOptions(userOptions) {
     row: {
       height: 24 //*
     },
-    maxRows: 3000, //*
+    maxTaskCount: 3000, //*
     maxHeight: 0, //*
     chart: {
       grid: {
@@ -476,7 +476,9 @@ const GanttElastic = {
           scroll: {
             left: 0, // 가로 스크롤 위치
             top: 0 // 세로 스크롤 위치
-          }
+          },
+          maxTaskCount: 3000,
+          maxRow: 200
         },
         dynamicStyle: {}, // 동적 스타일 설정
 
@@ -1601,11 +1603,11 @@ const GanttElastic = {
       console.log('visibleTasks computed start');
 
       const visibleTasks = this.state.tasks.filter(task => this.isTaskVisible(task));
-      const maxRows = visibleTasks.slice(0, this.state.options.maxRows);
+      const taskVisibleList = visibleTasks.slice(0, this.state.options.maxTaskCount);
 
       // Group tasks by row
       const tasksByRow = {};
-      maxRows.forEach(task => {
+      taskVisibleList.forEach(task => {
         if (!tasksByRow[task.row]) {
           tasksByRow[task.row] = [];
         }
