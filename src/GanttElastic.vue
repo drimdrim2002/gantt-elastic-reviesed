@@ -1528,12 +1528,16 @@ const GanttElastic = {
 
     getOriginYByRowIndex(_visibleTasks) {
       const originYByRowIndex = {};
+      const originYByVhclId = {};
       _visibleTasks.forEach(task => {
         if (!originYByRowIndex[task.row]) {
           originYByRowIndex[task.row] = task.y;
         }
+        if (!originYByVhclId[task.row]) {
+          originYByVhclId[task.row] = task.vhclId;
+        }
       });
-      return originYByRowIndex;
+      return { originYByRowIndex, originYByVhclId };
     },
 
     getRowBoundaries(_maxRow) {
@@ -1570,44 +1574,63 @@ const GanttElastic = {
     onTaskMoved(tasks) {
       console.log('onTaskMoved start');
 
-      const { originalTasks, toRow, selectedTasks } = tasks;
-      console.log(
-        `originalTasks: ${JSON.stringify(originalTasks)}, toRow: ${toRow}
-        , selectedTaks: ${JSON.stringify(selectedTasks)}`
-      );
+      const { toRow, selectedTasks } = tasks;
 
+      // fromRoute
       const fromVhclId = this.getFromRow(selectedTasks);
       const fromTaskList = this.state.taskByVhclId[fromVhclId];
 
       const fromTaskHashMap = {};
-      let fromTaskTreeMap = createRBTree();
 
       fromTaskList.forEach(task => {
-        fromTaskHashMap[task.startTime] = task;
-        fromTaskTreeMap = fromTaskTreeMap.insert(task.startTime, task);
         fromTaskHashMap[task.startTime] = task;
       });
 
       const firstTask = selectedTasks[0];
+      firstTask.dependentOn = [];
       const lastTask = selectedTasks[selectedTasks.length - 1];
 
       const prevIdOfFirstTask = firstTask.routeId + '-' + firstTask.vhclId + '-' + (parseInt(firstTask.label) - 1);
-      const nextIdOfLastTask = firstTask.routeId + '-' + firstTask.vhclId + '-' + (parseInt(firstTask.label) + 1);
-      console.log(`prevId: ${prevIdOfFirstTask}, nextId: ${nextIdOfLastTask}`);
+      const nextIdOfLastTask = lastTask.routeId + '-' + lastTask.vhclId + '-' + (parseInt(lastTask.label) + 1);
 
-      console.log(this.state.tasksById[prevIdOfFirstTask]);
-      console.log(this.state.tasksById[nextIdOfLastTask]);
+      const prevTaskOfFirstTask = this.state.tasksById[prevIdOfFirstTask];
+      const lastTaskOfLastTask = this.state.tasksById[nextIdOfLastTask];
 
-      if (
-        this.state.tasksById[prevIdOfFirstTask] !== undefined &&
-        this.state.tasksById[nextIdOfLastTask] !== undefined
-      ) {
-        lastTask.dependentOn = [];
-        lastTask.dependentOn.push(prevIdOfFirstTask);
-        console.log('hehe');
-
-        console.log(lastTask.dependentOn);
+      if (prevTaskOfFirstTask !== undefined && lastTaskOfLastTask !== undefined) {
+        lastTaskOfLastTask.dependentOn = [];
+        lastTaskOfLastTask.dependentOn.push(prevIdOfFirstTask);
+        console.log(
+          `lastTaskOfLastTask.id (${lastTaskOfLastTask.id}) ->  prevTaskOfFirstTask.id (${prevIdOfFirstTask})`
+        );
       }
+      console.log('haha 2');
+
+      const toVhclId = this.state.options.originYByVhclId[toRow.toString()];
+      const toTaskList = this.state.taskByVhclId[toVhclId];
+
+      const toTaskHashMap = {};
+      let toTaskTreeMap = createRBTree();
+      toTaskList.forEach(task => {
+        toTaskHashMap[task.startTime] = task;
+        toTaskTreeMap = toTaskTreeMap.insert(task.startTime, task);
+      });
+
+      console.log('haha');
+
+      let lt = toTaskTreeMap.lt(firstTask.startTime);
+      if (lt !== undefined || lt !== null) {
+        firstTask.dependentOn.push(lt.value.id);
+        console.log(`firstTask.id: ${firstTask.id} -> ${lt.value.id}`);
+      }
+
+      let gt = toTaskTreeMap.gt(firstTask.startTime);
+      if (gt !== undefined || gt !== null) {
+        this.state.tasksById[gt.value.id].dependentOn = [];
+        this.state.tasksById[gt.value.id].dependentOn.push(lastTask.id);
+        console.log(`gt.id: ${this.state.tasksById[gt.value.id].id} -> ${lastTask.id}`);
+      }
+
+      // toRoute
     }
   },
 
@@ -1649,12 +1672,13 @@ const GanttElastic = {
 
       let taskCount = visibleTasks.length;
 
-      const originYByRowIndex = this.getOriginYByRowIndex(visibleTasks);
+      const { originYByRowIndex, originYByVhclId } = this.getOriginYByRowIndex(visibleTasks);
       const maxRow = Object.keys(originYByRowIndex).length;
       const rowBoundaries = this.getRowBoundaries(maxRow);
 
       this.state.options.rowBoundaries = rowBoundaries;
       this.state.options.originYByRowIndex = originYByRowIndex;
+      this.state.options.originYByVhclId = originYByVhclId;
 
       for (let index = 0; index < taskCount; index++) {
         let task = visibleTasks[index];
