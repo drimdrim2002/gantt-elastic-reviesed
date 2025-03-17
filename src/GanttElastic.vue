@@ -1616,6 +1616,7 @@ const GanttElastic = {
 
       // Calculate total number of rows
       const totalRows = Object.keys(tasksByRow).length;
+      this.state.options.maxRow = totalRows;
       this.state.options.rowsHeight = this.getTaskHeight() * totalRows;
 
       let heightCompensation = 0;
@@ -1628,13 +1629,13 @@ const GanttElastic = {
       this.state.options.allVisibleTasksHeight = this.getTaskHeight() * Object.keys(tasksByRow).length;
       this.state.options.outerHeight = this.getHeight(totalRows, true) - heightCompensation;
 
-      let len = visibleTasks.length;
+      let taskCount = visibleTasks.length;
 
       const originYByRowIndex = this.getOriginYByRowIndex(visibleTasks);
       const maxRow = Object.keys(originYByRowIndex).length;
       const rowBoundaries = this.getRowBoundaries(maxRow);
 
-      for (let index = 0; index < len; index++) {
+      for (let index = 0; index < taskCount; index++) {
         let task = visibleTasks[index];
         task.width =
           task.duration / this.state.options.times.timePerPixel - this.style['grid-line-vertical']['stroke-width'];
@@ -1651,6 +1652,8 @@ const GanttElastic = {
         task.originYByRowIndex = originYByRowIndex;
         task.rowBoundaries = rowBoundaries;
       }
+
+      this.state.options.rowBoundaries = rowBoundaries;
 
       console.log('visibleTasks computed end');
 

@@ -346,7 +346,7 @@ export default {
 
           // 현재 y 위치에 해당하는 row 계산 (반올림)
 
-          for (let boundary of selectedTask.rowBoundaries) {
+          for (let boundary of this.root.state.options.rowBoundaries) {
             if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
               toRow = boundary.row;
               break;
