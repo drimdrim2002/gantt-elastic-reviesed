@@ -5,6 +5,7 @@
   "main": "src/GanttElastic.vue",
   "dependencies": {
     "dayjs": "^1.8.16",
+    "functional-red-black-tree": "^1.0.1",
     "gantt-elastic-header": "^0.1.11",
     "resize-observer-polyfill": "^1.5.1",
     "vue": "^2.6.10"

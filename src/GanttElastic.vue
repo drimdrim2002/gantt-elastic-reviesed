@@ -20,6 +20,8 @@ import dayjs from 'dayjs';
 import MainView from './components/MainView.vue';
 import getStyle from './style.js';
 import ResizeObserver from 'resize-observer-polyfill';
+// import RedBlackTree from './RedBlackTree.js';
+import createRBTree from './RbTree.js';
 
 const ctx = document.createElement('canvas').getContext('2d');
 let VueInst = VueInstance;
@@ -1552,6 +1554,19 @@ const GanttElastic = {
       }
       return boundaries;
     },
+
+    getFromRow(_selectedTasks) {
+      let vhclIdSet = new Set();
+      _selectedTasks.forEach(task => {
+        vhclIdSet.add(task.vhclId);
+      });
+
+      if (vhclIdSet.size > 1) {
+        alert(`You can't select tasks from different rows`);
+      }
+      return vhclIdSet.values().next().value;
+    },
+
     onTaskMoved(tasks) {
       console.log('onTaskMoved start');
 
@@ -1561,35 +1576,38 @@ const GanttElastic = {
         , selectedTaks: ${JSON.stringify(selectedTasks)}`
       );
 
-      tasks => {
-        // visible task에서 from row 에 해당하는 task를 가져온다.
-        // 여기서 selected task에 포함된 것을 지운다.
-        // 2. 각 row의 task들을 x 좌표 순으로 정렬하고 겹침 방지
-        // const rowTasks = {};
-        // // 현재 row의 모든 task 수집
-        // this.root.visibleTasks.forEach(task => {
-        //   if (!rowTasks[task.row]) {
-        //     rowTasks[task.row] = [];
-        //   }
-        //   rowTasks[task.row].push(task);
-        // });
-        // // 각 row의 task들을 x 좌표로 정렬
-        // Object.keys(rowTasks).forEach(row => {
-        //   const tasks = rowTasks[row];
-        //   tasks.sort((a, b) => a.x - b.x);
-        //   // 겹침 방지
-        //   for (let i = 1; i < tasks.length; i++) {
-        //     const prevTask = tasks[i - 1];
-        //     const currentTask = tasks[i];
-        //     const minGap = 30; // 최소 간격 (픽셀)
-        //     if (currentTask.x < prevTask.x + prevTask.width + minGap) {
-        //       currentTask.x = prevTask.x + prevTask.width + minGap;
-        //       // 시간 정보도 업데이트
-        //       currentTask.start = this.root.pixelOffsetXToTime(currentTask.x);
-        //     }
-        //   }
-        // });
-      };
+      const fromVhclId = this.getFromRow(selectedTasks);
+      const fromTaskList = this.state.taskByVhclId[fromVhclId];
+
+      const fromTaskHashMap = {};
+      let fromTaskTreeMap = createRBTree();
+
+      fromTaskList.forEach(task => {
+        fromTaskHashMap[task.startTime] = task;
+        fromTaskTreeMap = fromTaskTreeMap.insert(task.startTime, task);
+        fromTaskHashMap[task.startTime] = task;
+      });
+
+      const firstTask = selectedTasks[0];
+      const lastTask = selectedTasks[selectedTasks.length - 1];
+
+      const prevIdOfFirstTask = firstTask.routeId + '-' + firstTask.vhclId + '-' + (parseInt(firstTask.label) - 1);
+      const nextIdOfLastTask = firstTask.routeId + '-' + firstTask.vhclId + '-' + (parseInt(firstTask.label) + 1);
+      console.log(`prevId: ${prevIdOfFirstTask}, nextId: ${nextIdOfLastTask}`);
+
+      console.log(this.state.tasksById[prevIdOfFirstTask]);
+      console.log(this.state.tasksById[nextIdOfLastTask]);
+
+      if (
+        this.state.tasksById[prevIdOfFirstTask] !== undefined &&
+        this.state.tasksById[nextIdOfLastTask] !== undefined
+      ) {
+        lastTask.dependentOn = [];
+        lastTask.dependentOn.push(prevIdOfFirstTask);
+        console.log('hehe');
+
+        console.log(lastTask.dependentOn);
+      }
     }
   },
 

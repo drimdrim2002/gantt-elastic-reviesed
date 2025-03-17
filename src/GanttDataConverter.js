@@ -46,7 +46,7 @@ export const convertToInput = async function(_input) {
         }
 
         const ganttInfo = {
-            id, label, startTime, duration, type, row, dependentOn, style, progress, vhclId
+            id, label, startTime, duration, type, row, dependentOn, style, progress, vhclId, routeId
         }
 
         ganttInfoArray.push(ganttInfo);
