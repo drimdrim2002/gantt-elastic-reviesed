@@ -14,7 +14,6 @@ import Header from '../src/components/Header/Header.vue';
 import { convertToInput } from '../src/GanttDataConverter';
 import input from './input.json';
 
-
 export default {
   name: 'GanttExample',
   components: {
@@ -29,11 +28,11 @@ export default {
         times: {
           timeScale: 60 * 1000,
           timeZoom: 2,
-          firstTime: this.getDate({ year: 2024, month: 8, day: 2 , hour: 19 }),
-          lastTime: this.getDate({ year: 2024, month: 8, day: 3 , hour: 19 }),
+          firstTime: this.getDate({ year: 2024, month: 8, day: 2, hour: 19 }),
+          lastTime: this.getDate({ year: 2024, month: 8, day: 3, hour: 19 }),
 
-          firstTaskTime: this.getDate({ year: 2024, month: 8, day: 2 , hour: 22 }),
-          lastTaskTime: this.getDate({ year: 2024, month: 8, day: 3 , hour: 13 }),
+          firstTaskTime: this.getDate({ year: 2024, month: 8, day: 2, hour: 22 }),
+          lastTaskTime: this.getDate({ year: 2024, month: 8, day: 3, hour: 13 }),
           scope: {
             before: 0,
             after: 0
@@ -50,7 +49,7 @@ export default {
         row: {
           height: 34
         },
-        maxRows: 3000,
+        maxRows: 200,
         maxHeight: 0,
         taskList: {
           columns: [
@@ -59,8 +58,7 @@ export default {
               label: 'Vehicle ID',
               value: 'vhclId',
               width: 100
-            },
-              
+            }
           ]
         },
         calendar: {
