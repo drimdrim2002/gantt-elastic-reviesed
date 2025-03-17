@@ -337,7 +337,6 @@ export default {
           return;
         }
 
-        console.log(`this.originalPositions`, this.originalPositions);
         let toRow = -1;
         // 1. 먼저 각 task의 row 계산
         selectedTasks.forEach(selectedTask => {
@@ -353,7 +352,9 @@ export default {
             }
           }
 
-          selectedTask.y = selectedTask.originYByRowIndex[toRow];
+          console.log(`this.root.state.options.originYByRowIndex`, this.root.state.options.originYByRowIndex);
+
+          selectedTask.y = this.root.state.options.originYByRowIndex[toRow.toString()];
           // console.log(`task 배치 후후: `);
           // console.dir(selectedTask);
         });

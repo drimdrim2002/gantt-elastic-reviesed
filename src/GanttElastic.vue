@@ -1653,6 +1653,9 @@ const GanttElastic = {
       const maxRow = Object.keys(originYByRowIndex).length;
       const rowBoundaries = this.getRowBoundaries(maxRow);
 
+      this.state.options.rowBoundaries = rowBoundaries;
+      this.state.options.originYByRowIndex = originYByRowIndex;
+
       for (let index = 0; index < taskCount; index++) {
         let task = visibleTasks[index];
         task.width =
@@ -1665,13 +1668,7 @@ const GanttElastic = {
         task.y =
           (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * task.row +
           this.state.options.chart.grid.horizontal.gap;
-
-        task.maxRows = maxRow;
-        task.originYByRowIndex = originYByRowIndex;
-        task.rowBoundaries = rowBoundaries;
       }
-
-      this.state.options.rowBoundaries = rowBoundaries;
 
       console.log('visibleTasks computed end');
 
