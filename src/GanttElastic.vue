@@ -1601,8 +1601,27 @@ const GanttElastic = {
 
       const prevTaskOfFirstTask = fromTaskTreeMap.lt(Number(firstTask.x));
       const lastTaskOfLastTask = fromTaskTreeMap.gt(Number(lastTask.x));
+      console.log(
+        `prevTaskOfFirstTask: ${prevTaskOfFirstTask.value.id}, lastTaskOfLastTask: ${lastTaskOfLastTask.value.id}`
+      );
+
+      // 유의미한 이동이 없는 경우는 미리 찾아서 return 한다.
+      if (lastTaskOfLastTask.value === undefined) {
+        console.log('no link 1');
+        return;
+      } else {
+        if (
+          toRow === firstTask.row &&
+          firstTask.x > prevTaskOfFirstTask.value.x &&
+          lastTask.x < lastTaskOfLastTask.value.x
+        ) {
+          console.log('no link 2');
+          return;
+        }
+      }
 
       console.log('link from nodes');
+
       if (prevTaskOfFirstTask.value !== undefined && lastTaskOfLastTask.value !== undefined) {
         console.log(
           `lastTaskOfLastTask.id (${lastTaskOfLastTask.value.id}) ->  prevTaskOfFirstTask.id (${
@@ -1626,17 +1645,33 @@ const GanttElastic = {
       console.log('link to nodes 1');
       let lt = toTaskTreMap.lt(Number(firstTask.x));
       if (lt.value !== undefined) {
+        console.log(`first task id: ${firstTask.id} -> ${lt.value.id}`);
         changedDependencyMap[firstTask.id] = lt.value.id;
       }
 
       console.log('link to nodes 2');
       let gt = toTaskTreMap.gt(Number(lastTask.x));
       if (gt.value !== undefined) {
-        console.log(`gt.value: ${gt.value}`);
         console.log(`gt.value.id: ${gt.value.id} -> ${lastTask.id}`);
         changedIdMap[gt.value.id] = gt.value;
         changedDependencyMap[gt.value.id] = lastTask.id;
       }
+
+      console.log('apply');
+
+      this.state.tasks.forEach(task => {
+        if (changedIdMap[task.id]) {
+          task.x = changedIdMap[task.id].x;
+          task.y = changedIdMap[task.id].y;
+          task.start = changedIdMap[task.id].start;
+          task.row = changedIdMap[task.id].row;
+
+          if (changedDependencyMap[task.id]) {
+            task.dependentOn = [];
+            task.dependentOn = [changedDependencyMap[task.id]];
+          }
+        }
+      });
 
       console.log('end');
       // toRoute
