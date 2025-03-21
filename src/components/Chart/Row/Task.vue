@@ -266,6 +266,16 @@ export default {
       // 선택된 tasks를 상위 스코프에서 정의
       const copiedSelectedTasks = this.root.state.selectedTasks || [];
 
+      if (copiedSelectedTasks.length === 0) {
+        return;
+      }
+
+      copiedSelectedTasks.forEach(task => {
+        if (task.label === '0') {
+          return;
+        }
+      });
+
       // 원래 위치 저장
       this.originalPositions = copiedSelectedTasks.map(task => ({
         id: task.id,
