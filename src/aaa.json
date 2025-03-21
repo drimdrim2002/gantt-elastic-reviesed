@@ -1,0 +1,491 @@
+originalTasks: [
+    {
+        "id": "R_008-D1742-2",
+        "x": 351.64713071496027,
+        "y": 283,
+        "row": 7,
+        "vhclId": "D1742"
+    },
+    {
+        "id": "R_008-D1742-3",
+        "x": 368.2295428031776,
+        "y": 283,
+        "row": 7,
+        "vhclId": "D1742"
+    },
+    {
+        "id": "R_008-D1742-4",
+        "x": 388.0895505805233,
+        "y": 283,
+        "row": 7,
+        "vhclId": "D1742"
+    },
+    {
+        "id": "R_008-D1742-5",
+        "x": 409.00505527470693,
+        "y": 283,
+        "row": 7,
+        "vhclId": "D1742"
+    }
+], toRow: 9, selectedTaks: [
+    {
+        "id": "R_008-D1742-2",
+        "label": "2",
+        "startTime": 1722605460000,
+        "duration": 600,
+        "type": "task",
+        "row": 7,
+        "dependentOn": [
+            "R_008-D1742-1"
+        ],
+        "style": {
+            "base": {
+                "fill": "#8000FF"
+            }
+        },
+        "progress": 100,
+        "vhclId": "D1742",
+        "start": 1722601517781,
+        "collapsed": false,
+        "x": 241.64713071496027,
+        "y": 363,
+        "width": 0,
+        "height": 34,
+        "mouseOver": false,
+        "parentId": null,
+        "children": [],
+        "allChildren": [],
+        "parents": [],
+        "parent": null,
+        "endTime": 1722605460600,
+        "maxRows": 13,
+        "originYByRowIndex": {
+            "0": 3,
+            "1": 43,
+            "2": 83,
+            "3": 123,
+            "4": 163,
+            "5": 203,
+            "6": 243,
+            "7": 283,
+            "8": 323,
+            "9": 363,
+            "10": 403,
+            "11": 443,
+            "12": 483
+        },
+        "rowBoundaries": [
+            {
+                "row": 0,
+                "min": -20,
+                "max": 20
+            },
+            {
+                "row": 1,
+                "min": 20,
+                "max": 60
+            },
+            {
+                "row": 2,
+                "min": 60,
+                "max": 100
+            },
+            {
+                "row": 3,
+                "min": 100,
+                "max": 140
+            },
+            {
+                "row": 4,
+                "min": 140,
+                "max": 180
+            },
+            {
+                "row": 5,
+                "min": 180,
+                "max": 220
+            },
+            {
+                "row": 6,
+                "min": 220,
+                "max": 260
+            },
+            {
+                "row": 7,
+                "min": 260,
+                "max": 300
+            },
+            {
+                "row": 8,
+                "min": 300,
+                "max": 340
+            },
+            {
+                "row": 9,
+                "min": 340,
+                "max": 380
+            },
+            {
+                "row": 10,
+                "min": 380,
+                "max": 420
+            },
+            {
+                "row": 11,
+                "min": 420,
+                "max": 460
+            },
+            {
+                "row": 12,
+                "min": 460,
+                "max": 500
+            }
+        ],
+        "isSelected": true
+    },
+    {
+        "id": "R_008-D1742-3",
+        "label": "3",
+        "startTime": 1722606057000,
+        "duration": 600,
+        "type": "task",
+        "row": 7,
+        "dependentOn": [
+            "R_008-D1742-2"
+        ],
+        "style": {
+            "base": {
+                "fill": "#8000FF"
+            }
+        },
+        "progress": 100,
+        "vhclId": "D1742",
+        "start": 1722602114781,
+        "collapsed": false,
+        "x": 258.2295428031776,
+        "y": 363,
+        "width": 0,
+        "height": 34,
+        "mouseOver": false,
+        "parentId": null,
+        "children": [],
+        "allChildren": [],
+        "parents": [],
+        "parent": null,
+        "endTime": 1722606057600,
+        "maxRows": 13,
+        "originYByRowIndex": {
+            "0": 3,
+            "1": 43,
+            "2": 83,
+            "3": 123,
+            "4": 163,
+            "5": 203,
+            "6": 243,
+            "7": 283,
+            "8": 323,
+            "9": 363,
+            "10": 403,
+            "11": 443,
+            "12": 483
+        },
+        "rowBoundaries": [
+            {
+                "row": 0,
+                "min": -20,
+                "max": 20
+            },
+            {
+                "row": 1,
+                "min": 20,
+                "max": 60
+            },
+            {
+                "row": 2,
+                "min": 60,
+                "max": 100
+            },
+            {
+                "row": 3,
+                "min": 100,
+                "max": 140
+            },
+            {
+                "row": 4,
+                "min": 140,
+                "max": 180
+            },
+            {
+                "row": 5,
+                "min": 180,
+                "max": 220
+            },
+            {
+                "row": 6,
+                "min": 220,
+                "max": 260
+            },
+            {
+                "row": 7,
+                "min": 260,
+                "max": 300
+            },
+            {
+                "row": 8,
+                "min": 300,
+                "max": 340
+            },
+            {
+                "row": 9,
+                "min": 340,
+                "max": 380
+            },
+            {
+                "row": 10,
+                "min": 380,
+                "max": 420
+            },
+            {
+                "row": 11,
+                "min": 420,
+                "max": 460
+            },
+            {
+                "row": 12,
+                "min": 460,
+                "max": 500
+            }
+        ],
+        "isSelected": true
+    },
+    {
+        "id": "R_008-D1742-4",
+        "label": "4",
+        "startTime": 1722606772000,
+        "duration": 600,
+        "type": "task",
+        "row": 7,
+        "dependentOn": [
+            "R_008-D1742-3"
+        ],
+        "style": {
+            "base": {
+                "fill": "#8000FF"
+            }
+        },
+        "progress": 100,
+        "vhclId": "D1742",
+        "start": 1722602829781,
+        "collapsed": false,
+        "x": 278.0895505805233,
+        "y": 363,
+        "width": 0,
+        "height": 34,
+        "mouseOver": false,
+        "parentId": null,
+        "children": [],
+        "allChildren": [],
+        "parents": [],
+        "parent": null,
+        "endTime": 1722606772600,
+        "maxRows": 13,
+        "originYByRowIndex": {
+            "0": 3,
+            "1": 43,
+            "2": 83,
+            "3": 123,
+            "4": 163,
+            "5": 203,
+            "6": 243,
+            "7": 283,
+            "8": 323,
+            "9": 363,
+            "10": 403,
+            "11": 443,
+            "12": 483
+        },
+        "rowBoundaries": [
+            {
+                "row": 0,
+                "min": -20,
+                "max": 20
+            },
+            {
+                "row": 1,
+                "min": 20,
+                "max": 60
+            },
+            {
+                "row": 2,
+                "min": 60,
+                "max": 100
+            },
+            {
+                "row": 3,
+                "min": 100,
+                "max": 140
+            },
+            {
+                "row": 4,
+                "min": 140,
+                "max": 180
+            },
+            {
+                "row": 5,
+                "min": 180,
+                "max": 220
+            },
+            {
+                "row": 6,
+                "min": 220,
+                "max": 260
+            },
+            {
+                "row": 7,
+                "min": 260,
+                "max": 300
+            },
+            {
+                "row": 8,
+                "min": 300,
+                "max": 340
+            },
+            {
+                "row": 9,
+                "min": 340,
+                "max": 380
+            },
+            {
+                "row": 10,
+                "min": 380,
+                "max": 420
+            },
+            {
+                "row": 11,
+                "min": 420,
+                "max": 460
+            },
+            {
+                "row": 12,
+                "min": 460,
+                "max": 500
+            }
+        ],
+        "isSelected": true
+    },
+    {
+        "id": "R_008-D1742-5",
+        "label": "5",
+        "startTime": 1722607525000,
+        "duration": 600,
+        "type": "task",
+        "row": 7,
+        "dependentOn": [
+            "R_008-D1742-4"
+        ],
+        "style": {
+            "base": {
+                "fill": "#8000FF"
+            }
+        },
+        "progress": 100,
+        "vhclId": "D1742",
+        "start": 1722603582781,
+        "collapsed": false,
+        "x": 299.00505527470693,
+        "y": 363,
+        "width": 0,
+        "height": 34,
+        "mouseOver": false,
+        "parentId": null,
+        "children": [],
+        "allChildren": [],
+        "parents": [],
+        "parent": null,
+        "endTime": 1722607525600,
+        "maxRows": 13,
+        "originYByRowIndex": {
+            "0": 3,
+            "1": 43,
+            "2": 83,
+            "3": 123,
+            "4": 163,
+            "5": 203,
+            "6": 243,
+            "7": 283,
+            "8": 323,
+            "9": 363,
+            "10": 403,
+            "11": 443,
+            "12": 483
+        },
+        "rowBoundaries": [
+            {
+                "row": 0,
+                "min": -20,
+                "max": 20
+            },
+            {
+                "row": 1,
+                "min": 20,
+                "max": 60
+            },
+            {
+                "row": 2,
+                "min": 60,
+                "max": 100
+            },
+            {
+                "row": 3,
+                "min": 100,
+                "max": 140
+            },
+            {
+                "row": 4,
+                "min": 140,
+                "max": 180
+            },
+            {
+                "row": 5,
+                "min": 180,
+                "max": 220
+            },
+            {
+                "row": 6,
+                "min": 220,
+                "max": 260
+            },
+            {
+                "row": 7,
+                "min": 260,
+                "max": 300
+            },
+            {
+                "row": 8,
+                "min": 300,
+                "max": 340
+            },
+            {
+                "row": 9,
+                "min": 340,
+                "max": 380
+            },
+            {
+                "row": 10,
+                "min": 380,
+                "max": 420
+            },
+            {
+                "row": 11,
+                "min": 420,
+                "max": 460
+            },
+            {
+                "row": 12,
+                "min": 460,
+                "max": 500
+            }
+        ],
+        "isSelected": true
+    }
+]

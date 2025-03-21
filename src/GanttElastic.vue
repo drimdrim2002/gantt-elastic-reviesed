@@ -1575,61 +1575,70 @@ const GanttElastic = {
       console.log('onTaskMoved start');
 
       const { toRow, selectedTasks } = tasks;
+      const changedIdMap = {};
+      const changedDependencyMap = {};
 
-      // fromRoute
+      console.log('get selected task info');
+      const selectedTaskIdSet = new Set();
+      selectedTasks.forEach(task => {
+        selectedTaskIdSet.add(task.id);
+        changedIdMap[task.id] = task;
+      });
+
+      console.log('get from row');
       const fromVhclId = this.getFromRow(selectedTasks);
-      const fromTaskList = this.state.taskByVhclId[fromVhclId];
-
-      const fromTaskHashMap = {};
-
+      const fromTaskList = JSON.parse(JSON.stringify(this.state.taskByVhclId[fromVhclId]));
+      let fromTaskTreeMap = createRBTree();
       fromTaskList.forEach(task => {
-        fromTaskHashMap[task.startTime] = task;
+        if (!selectedTaskIdSet.has(task.id)) {
+          fromTaskTreeMap = fromTaskTreeMap.insert(Number(task.x), task);
+        }
       });
 
       const firstTask = selectedTasks[0];
-      firstTask.dependentOn = [];
       const lastTask = selectedTasks[selectedTasks.length - 1];
+      console.log(`firstTask: ${firstTask.id}, lastTask: ${lastTask.id}`);
 
-      const prevIdOfFirstTask = firstTask.routeId + '-' + firstTask.vhclId + '-' + (parseInt(firstTask.label) - 1);
-      const nextIdOfLastTask = lastTask.routeId + '-' + lastTask.vhclId + '-' + (parseInt(lastTask.label) + 1);
+      const prevTaskOfFirstTask = fromTaskTreeMap.lt(Number(firstTask.x));
+      const lastTaskOfLastTask = fromTaskTreeMap.gt(Number(lastTask.x));
 
-      const prevTaskOfFirstTask = this.state.tasksById[prevIdOfFirstTask];
-      const lastTaskOfLastTask = this.state.tasksById[nextIdOfLastTask];
-
-      if (prevTaskOfFirstTask !== undefined && lastTaskOfLastTask !== undefined) {
-        lastTaskOfLastTask.dependentOn = [];
-        lastTaskOfLastTask.dependentOn.push(prevIdOfFirstTask);
+      console.log('link from nodes');
+      if (prevTaskOfFirstTask.value !== undefined && lastTaskOfLastTask.value !== undefined) {
         console.log(
-          `lastTaskOfLastTask.id (${lastTaskOfLastTask.id}) ->  prevTaskOfFirstTask.id (${prevIdOfFirstTask})`
+          `lastTaskOfLastTask.id (${lastTaskOfLastTask.value.id}) ->  prevTaskOfFirstTask.id (${
+            prevTaskOfFirstTask.value.id
+          })`
         );
+        changedDependencyMap[lastTaskOfLastTask.value.id] = prevTaskOfFirstTask.value.id;
+        changedIdMap[lastTaskOfLastTask.value.id] = lastTaskOfLastTask.value;
       }
-      console.log('haha 2');
 
+      console.log('get toTaskTreeMap');
       const toVhclId = this.state.options.originYByVhclId[toRow.toString()];
-      const toTaskList = this.state.taskByVhclId[toVhclId];
-
-      const toTaskHashMap = {};
-      let toTaskTreeMap = createRBTree();
+      const toTaskList = JSON.parse(JSON.stringify(this.state.taskByVhclId[toVhclId]));
+      let toTaskTreMap = createRBTree();
       toTaskList.forEach(task => {
-        toTaskHashMap[task.startTime] = task;
-        toTaskTreeMap = toTaskTreeMap.insert(task.startTime, task);
+        if (!selectedTaskIdSet.has(task.id)) {
+          toTaskTreMap = toTaskTreMap.insert(Number(task.x), task);
+        }
       });
 
-      console.log('haha');
-
-      let lt = toTaskTreeMap.lt(firstTask.startTime);
-      if (lt !== undefined || lt !== null) {
-        firstTask.dependentOn.push(lt.value.id);
-        console.log(`firstTask.id: ${firstTask.id} -> ${lt.value.id}`);
+      console.log('link to nodes 1');
+      let lt = toTaskTreMap.lt(Number(firstTask.x));
+      if (lt.value !== undefined) {
+        changedDependencyMap[firstTask.id] = lt.value.id;
       }
 
-      let gt = toTaskTreeMap.gt(firstTask.startTime);
-      if (gt !== undefined || gt !== null) {
-        this.state.tasksById[gt.value.id].dependentOn = [];
-        this.state.tasksById[gt.value.id].dependentOn.push(lastTask.id);
-        console.log(`gt.id: ${this.state.tasksById[gt.value.id].id} -> ${lastTask.id}`);
+      console.log('link to nodes 2');
+      let gt = toTaskTreMap.gt(Number(lastTask.x));
+      if (gt.value !== undefined) {
+        console.log(`gt.value: ${gt.value}`);
+        console.log(`gt.value.id: ${gt.value.id} -> ${lastTask.id}`);
+        changedIdMap[gt.value.id] = gt.value;
+        changedDependencyMap[gt.value.id] = lastTask.id;
       }
 
+      console.log('end');
       // toRoute
     }
   },
