@@ -41,10 +41,10 @@
         opacity: '1'
       }"
       :x="task.x"
-      :y="task.y + (root.state.options.row.height - 24) / 2"
-      :width="24"
-      :height="24"
-      :viewBox="'0 0 24 24'"
+      :y="task.y + (root.state.options.row.height - this.circleRadius * 2) / 2"
+      :width="this.circleRadius * 2"
+      :height="this.circleRadius * 2"
+      :viewBox="viewBoxValue"
       @click="onTaskClick"
       @mouseenter="showTooltip"
       @mouseleave="hideTooltip"
@@ -57,7 +57,7 @@
     >
       <defs>
         <clipPath :id="clipPathId">
-          <circle cx="12" cy="12" r="12" />
+          <circle :cx="this.circleRadius" :cy="this.circleRadius" :r="this.circleRadius" />
         </clipPath>
       </defs>
       <circle
@@ -69,15 +69,15 @@
           ...task.style['chart-row-bar-polygon'],
           stroke: 'none'
         }"
-        cx="12"
-        cy="12"
-        r="12"
+        :cx="this.circleRadius"
+        :cy="this.circleRadius"
+        :r="this.circleRadius"
         fill="#42b983"
       ></circle>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
       <text
-        x="12"
-        y="12"
+        :x="this.circleRadius"
+        :y="this.circleRadius"
         text-anchor="middle"
         alignment-baseline="middle"
         :style="{
@@ -93,9 +93,9 @@
       <!-- 선택 표시 원 -->
       <circle
         v-if="isSelected"
-        cx="12"
-        cy="12"
-        r="14"
+        :cx="this.circleRadius"
+        :cy="this.circleRadius"
+        :r="this.circleRadius + 2"
         fill="none"
         :stroke="task.style.base.fill || '#42b983'"
         stroke-width="2.5"
@@ -133,6 +133,7 @@ export default {
   mixins: [taskMixin],
   data() {
     return {
+      circleRadius: 15,
       isDragging: false,
       hasMoved: false,
       minDragDistance: 1,
@@ -170,6 +171,10 @@ export default {
      */
     displayExpander() {
       return this.task.type === 'project' || (this.task.children && this.task.children.length > 0);
+    },
+
+    viewBoxValue() {
+      return `0 0 ${this.circleRadius * 2} ${this.circleRadius * 2}`;
     }
   },
   methods: {
@@ -184,7 +189,7 @@ export default {
       event.stopPropagation();
 
       const tooltipHeight = 100;
-      const taskWidth = 24;
+      const taskWidth = this.circleRadius * 2;
       const tooltipOffset = 10;
       this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
       this.tooltipY = Number(this.task.y) - tooltipHeight / 2;
