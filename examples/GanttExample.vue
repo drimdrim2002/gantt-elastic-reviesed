@@ -47,7 +47,7 @@ export default {
           html: false
         },
         row: {
-          height: 34
+          height: 51
         },
         maxRows: 200,
         maxHeight: 0,
