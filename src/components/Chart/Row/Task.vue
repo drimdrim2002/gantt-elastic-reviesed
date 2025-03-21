@@ -264,10 +264,10 @@ export default {
       this.root.state.isDragging = true;
 
       // 선택된 tasks를 상위 스코프에서 정의
-      const selectedTasks = this.root.state.selectedTasks || [];
+      const copiedSelectedTasks = this.root.state.selectedTasks || [];
 
       // 원래 위치 저장
-      this.originalPositions = selectedTasks.map(task => ({
+      this.originalPositions = copiedSelectedTasks.map(task => ({
         id: task.id,
         x: task.x,
         y: task.y,
@@ -291,7 +291,7 @@ export default {
         }
 
         // 선택된 모든 task 이동
-        selectedTasks.forEach(selectedTask => {
+        copiedSelectedTasks.forEach(selectedTask => {
           // 새로운 위치 계산
           const newX = selectedTask.x + dx;
           const newY = selectedTask.y + dy;
@@ -310,7 +310,7 @@ export default {
         this.dragStartY = e.clientY;
 
         // 올바른 이벤트 이름으로 변경
-        this.$emit('chart-task-taskDragging', { tasks: selectedTasks, event: e });
+        this.$emit('chart-task-taskDragging', { tasks: copiedSelectedTasks, event: e });
       };
 
       const onMouseUp = e => {
@@ -326,7 +326,7 @@ export default {
         if (!this.hasMoved) {
           // 원래 위치로 복원
           this.originalPositions.forEach(original => {
-            const task = selectedTasks.find(t => t.id === original.id);
+            const task = copiedSelectedTasks.find(t => t.id === original.id);
             if (task) {
               task.x = original.x;
               task.y = original.y;
@@ -344,7 +344,7 @@ export default {
 
         let toRow = -1;
         // 1. 먼저 각 task의 row 계산
-        selectedTasks.forEach(selectedTask => {
+        copiedSelectedTasks.forEach(selectedTask => {
           // console.log(`task 배치 전: `);
           // console.dir(selectedTask);
 
@@ -369,7 +369,7 @@ export default {
 
         // 올바른 이벤트 이름으로 변경
         this.$emit('chart-task-taskDragEnd', {
-          selectedTasks: selectedTasks,
+          selectedTasks: copiedSelectedTasks,
           event: e,
           originalTasks: this.originalPositions,
           toRow: toRow
