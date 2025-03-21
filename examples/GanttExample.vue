@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%;height:100%">
+  <div v-if="elasticComponentReady" style="width:100%;height:100%">
     <gantt-elastic :tasks="tasks" :options="options" @task-selected="onTaskSelected">
       <gantt-header slot="header"></gantt-header>
     </gantt-elastic>
@@ -22,6 +22,7 @@ export default {
   },
   data() {
     return {
+      elasticComponentReady: false,
       tasks: [],
       selectedTasksCount: 0,
       options: {
@@ -212,6 +213,7 @@ export default {
     this.popupInfo = popupInfo;
   },
   mounted() {
+    this.elasticComponentReady = false;
     this.$root.$on('gantt-elastic-ready', ganttElasticInstance => {
       ganttElasticInstance.$on('tasks-changed', tasks => {
         this.tasks = tasks;
@@ -220,6 +222,7 @@ export default {
         this.options = options;
       });
     });
+    this.elasticComponentReady = true;
   }
 };
 </script>
