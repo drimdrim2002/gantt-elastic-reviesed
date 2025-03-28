@@ -46,8 +46,6 @@
       :height="this.circleRadius * 2"
       :viewBox="viewBoxValue"
       @click="onTaskClick"
-      @mouseenter="showTooltip"
-      @mouseleave="hideTooltip"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
@@ -104,14 +102,14 @@
       />
     </svg>
     <!-- SVG foreignObject 기반 툴팁 -->
-    <foreignObject v-if="showingTooltip" :x="tooltipX" :y="tooltipY" width="200" height="100" class="task-tooltip">
+    <!-- <foreignObject v-if="showingTooltip" :x="tooltipX" :y="tooltipY" width="200" height="100" class="task-tooltip">
       <div xmlns="http://www.w3.org/1999/xhtml" class="tooltip-content">
         <div><strong>Task:</strong> {{ task.label }}</div>
         <div><strong>Start:</strong> {{ formatDate(task.start) }}</div>
         <div><strong>Duration:</strong> {{ formatDuration(task.duration) }}</div>
         <div><strong>Progress:</strong> {{ task.progress }}%</div>
       </div>
-    </foreignObject>
+    </foreignObject> -->
   </g>
 </template>
 
@@ -140,10 +138,7 @@ export default {
       dragStartX: 0,
       dragStartY: 0,
       originalPositions: [],
-      isSelected: false,
-      showingTooltip: false,
-      tooltipX: 0,
-      tooltipY: 0
+      isSelected: false
     };
   },
   computed: {
@@ -155,17 +150,7 @@ export default {
     clipPathId() {
       return 'gantt-elastic__task-clip-path-' + this.task.id;
     },
-    /**
-     * Get tooltip style
-     */
-    tooltipStyle() {
-      return {
-        position: 'absolute',
-        left: `${this.tooltipX}px`,
-        top: `${this.tooltipY}px`,
-        zIndex: 9999
-      };
-    },
+
     /**
      * Get tooltip style
      */
@@ -181,50 +166,50 @@ export default {
     /**
      * Show tooltip
      */
-    showTooltip(event) {
-      // 먼저 이벤트 전달
-      this.emitEvent('mouseenter', event);
+    // showTooltip(event) {
+    //   // 먼저 이벤트 전달
+    //   this.emitEvent('mouseenter', event);
 
-      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
-      event.stopPropagation();
+    //   // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
+    //   event.stopPropagation();
 
-      const tooltipHeight = 100;
-      const taskWidth = this.circleRadius * 2;
-      const tooltipOffset = 10;
-      this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
-      this.tooltipY = Number(this.task.y) - tooltipHeight / 2;
+    //   const tooltipHeight = 100;
+    //   const taskWidth = this.circleRadius * 2;
+    //   const tooltipOffset = 10;
+    //   this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
+    //   this.tooltipY = Number(this.task.y) - tooltipHeight / 2;
 
-      this.showingTooltip = true;
-    },
+    //   this.showingTooltip = true;
+    // },
 
     /**
      * Hide tooltip
      */
-    hideTooltip(event) {
-      // 먼저 이벤트 전달
-      this.emitEvent('mouseleave', event);
+    // hideTooltip(event) {
+    //   // 먼저 이벤트 전달
+    //   this.emitEvent('mouseleave', event);
 
-      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
-      event.stopPropagation();
+    //   // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
+    //   event.stopPropagation();
 
-      this.showingTooltip = false;
-    },
+    //   this.showingTooltip = false;
+    // },
 
     /**
      * Format date
      */
-    formatDate(timestamp) {
-      const date = new Date(timestamp);
-      return date.toLocaleString();
-    },
+    // formatDate(timestamp) {
+    //   const date = new Date(timestamp);
+    //   return date.toLocaleString();
+    // },
 
-    /**
-     * Format duration
-     */
-    formatDuration(duration) {
-      const hours = duration / (60 * 60 * 1000);
-      return `${hours.toFixed(1)} hours`;
-    },
+    // /**
+    //  * Format duration
+    //  */
+    // formatDuration(duration) {
+    //   const hours = duration / (60 * 60 * 1000);
+    //   return `${hours.toFixed(1)} hours`;
+    // },
 
     onTaskClick(event) {
       // 먼저 이벤트 전달
@@ -443,26 +428,6 @@ export default {
 </script>
 
 <style scoped>
-.task-tooltip {
-  position: absolute;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.tooltip-content {
-  background: white;
-  padding: 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ddd;
-  font-size: 12px;
-  line-height: 1.4;
-  color: #333;
-  min-width: 150px;
-  white-space: nowrap;
-  z-index: 9999;
-}
-
 .gantt-elastic__chart-row-bar-wrapper {
   user-select: none;
 }
