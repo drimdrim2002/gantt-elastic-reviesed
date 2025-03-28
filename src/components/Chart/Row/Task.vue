@@ -281,7 +281,8 @@ export default {
         y: task.y,
         start: task.start,
         row: task.row,
-        vhclId: task.vhclId
+        vhclId: task.vhclId,
+        dependentOn: task.dependentOn
       }));
 
       const onMouseMove = e => {
@@ -339,6 +340,9 @@ export default {
               task.x = original.x;
               task.y = original.y;
               task.start = original.start;
+              task.row = original.row;
+              task.vhclId = original.vhclId;
+              task.dependentOn = original.dependentOn;
             }
           });
 
@@ -351,6 +355,7 @@ export default {
         }
 
         let toRow = -1;
+        let fromRow = -1;
         // 1. 먼저 각 task의 row 계산
         copiedSelectedTasks.forEach(selectedTask => {
           // console.log(`task 배치 전: `);
@@ -361,6 +366,13 @@ export default {
           for (let boundary of this.root.state.options.rowBoundaries) {
             if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
               toRow = boundary.row;
+            }
+
+            if (this.originalPositions[0].y >= boundary.min && this.originalPositions[0].y < boundary.max) {
+              fromRow = boundary.row;
+            }
+
+            if (fromRow !== -1 && toRow !== -1) {
               break;
             }
           }
@@ -371,6 +383,22 @@ export default {
           // console.log(`task 배치 후후: `);
           // console.dir(selectedTask);
         });
+
+        if (copiedSelectedTasks.length > 0) {
+          console.log('alert!!');
+
+          // 팝업 표시를 위한 이벤트 발생
+          this.$emit('chart-task-showMoveConfirmation', {
+            tasks: copiedSelectedTasks,
+            originalTasks: this.originalPositions,
+            toRow: toRow,
+            fromRow: fromRow
+          });
+
+          console.log('emit chart-task-showMoveConfirmation gogo');
+
+          // 팝업 응답을 기다리기 위해 여기서 함수 종료
+        }
 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);

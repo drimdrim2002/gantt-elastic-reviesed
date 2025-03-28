@@ -69,12 +69,25 @@
                 @chart-task-popup-click="handlePopupClick"
                 @chart-task-taskDragging="onTaskDragging"
                 @chart-task-taskDragEnd="onTaskDragEnd"
+                @chart-task-showMoveConfirmation="handleShowMoveConfirmation"
               ></component>
             </g>
           </svg>
         </div>
       </div>
     </div>
+
+    <!-- 작업 이동 확인 팝업 -->
+    <move-confirmation-popup
+      :visible="showMoveConfirmation"
+      :tasks="moveConfirmationData.tasks"
+      :original-tasks="moveConfirmationData.originalTasks"
+      :to-row="moveConfirmationData.toRow"
+      :from-row="moveConfirmationData.fromRow"
+      :vhcl-id-by-row="root.vhclIdByRow"
+      @confirm="confirmTaskMove"
+      @cancel="cancelTaskMove"
+    />
   </div>
 </template>
 
@@ -86,6 +99,7 @@ import DependencyLines from './DependencyLines.vue';
 import Task from './Row/Task.vue';
 import Milestone from './Row/Milestone.vue';
 import Project from './Row/Project.vue';
+import MoveConfirmationPopup from './MoveConfirmationPopup.vue';
 
 export default {
   name: 'Chart',
@@ -95,12 +109,20 @@ export default {
     Calendar,
     Task,
     Milestone,
-    Project
+    Project,
+    MoveConfirmationPopup
     // DaysHighlight
   },
   inject: ['root'],
   data() {
     return {
+      showMoveConfirmation: false,
+      moveConfirmationData: {
+        tasks: [],
+        originalTasks: [],
+        toRow: -1,
+        fromRow: -1
+      },
       shiftKeyPressed: false,
       ctrlKeyPressed: false,
       _taskSelectionTimeout: null,
@@ -117,6 +139,10 @@ export default {
     this.root.state.refs.chartGraph = this.$refs.chartGraph;
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg;
     this.$refs.chartGraphSvg.focus();
+
+    console.log('chart mounted');
+    // 이벤트 리스너 등록
+    this.$on('chart-task-showMoveConfirmation', this.handleShowMoveConfirmation);
 
     // 문서 레벨에서 이벤트 리스너 등록
     document.addEventListener('keydown', this.onKeyDown);
@@ -389,6 +415,50 @@ export default {
      */
     focusSvg() {
       this.$refs.chartGraphSvg.focus();
+    },
+
+    // 팝업 표시 이벤트 핸들러
+    handleShowMoveConfirmation(data) {
+      console.log('handleShowMoveConfirmation', data);
+      this.moveConfirmationData = {
+        tasks: data.tasks,
+        originalTasks: data.originalTasks,
+        toRow: data.toRow,
+        fromRow: data.fromRow
+      };
+      this.showMoveConfirmation = true;
+    },
+
+    // 확인 버튼 클릭 시 처리
+    confirmTaskMove() {
+      this.showMoveConfirmation = false;
+
+      // 여기서 작업 이동 처리 로직 실행
+      // 예: API 호출, 상태 업데이트 등
+
+      // 작업 완료 후 선택 초기화
+      // this.root.updateSelectedTasks([]);
+    },
+
+    // 취소 버튼 클릭 시 처리
+    cancelTaskMove() {
+      this.showMoveConfirmation = false;
+
+      // 원래 위치로 복원
+      this.moveConfirmationData.originalTasks.forEach(original => {
+        const task = this.moveConfirmationData.tasks.find(t => t.id === original.id);
+        if (task) {
+          task.x = original.x;
+          task.y = original.y;
+          task.start = original.start;
+          task.row = original.row;
+          task.vhclId = original.vhclId;
+          task.dependentOn = original.dependentOn;
+        }
+      });
+
+      // 선택 초기화
+      this.root.updateSelectedTasks([]);
     }
   },
 
@@ -398,6 +468,8 @@ export default {
     window.removeEventListener('blur', this.resetKeyState);
     this.$el.removeEventListener('click', this.focusSvg);
     window.removeEventListener('keydown', this.handleGlobalKeyDown);
+    // 이벤트 리스너 제거
+    this.$off('chart-task-showMoveConfirmation', this.handleShowMoveConfirmation);
   }
 };
 </script>

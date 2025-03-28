@@ -1770,6 +1770,16 @@ const GanttElastic = {
      */
     outputOptions() {
       return this.state.options;
+    },
+
+    vhclIdByRow() {
+      const vhclIdByRow = {};
+      this.tasks.forEach(task => {
+        if (!vhclIdByRow[task.row]) {
+          vhclIdByRow[task.row] = task.vhclId;
+        }
+      });
+      return vhclIdByRow;
     }
   },
 
