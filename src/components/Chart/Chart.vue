@@ -126,7 +126,8 @@ export default {
       shiftKeyPressed: false,
       ctrlKeyPressed: false,
       _taskSelectionTimeout: null,
-      lastSelectedTaskId: null
+      lastSelectedTaskId: null,
+      selectedTasksMap: new Map()
     };
   },
   /**
@@ -196,9 +197,11 @@ export default {
      * 선택 상태 완전 초기화
      */
     clearAllSelections() {
-      // console.log('Clearing all selections');
       // 마지막 선택 task 초기화
       this.lastSelectedTaskId = null;
+
+      // HashMap 초기화
+      this.selectedTasksMap.clear();
 
       // 선택된 모든 task 초기화
       this.root.updateSelectedTasks([]);
@@ -315,24 +318,37 @@ export default {
         // Ctrl/Cmd 키를 누른 상태에서 클릭한 경우
         else if (originalEvent.ctrlKey || originalEvent.metaKey || this.ctrlKeyPressed) {
           // 다른 row 선택 시도 체크
-          if (currentSelection.length > 0) {
-            const selectedRow = currentSelection[0].row;
-            if (task.row !== selectedRow) {
+          if (this.selectedTasksMap.size > 0) {
+            const firstSelectedTask = this.selectedTasksMap.values().next().value;
+            if (task.row !== firstSelectedTask.row) {
               alert('다른 row의 task는 선택할 수 없습니다. 같은 row의 task만 선택 가능합니다.');
               this.clearAllSelections();
               return;
             }
           }
 
-          if (isSelected) {
-            // 이미 선택된 task라면 제거
-            updateSelection(currentSelection.filter(t => t.id !== task.id));
+          console.log('Ctrl Selection Debug:', {
+            taskId: task.id,
+            isInMap: this.selectedTasksMap.has(task.id),
+            currentMapSize: this.selectedTasksMap.size
+          });
+
+          // HashMap을 사용한 선택 상태 토글
+          if (this.selectedTasksMap.has(task.id)) {
+            // 이미 선택된 task면 제거
+            this.selectedTasksMap.delete(task.id);
+            console.log('Task removed from selection:', task.id);
           } else {
-            // 선택되지 않은 task라면 추가
-            updateSelection([...currentSelection, task]);
+            // 선택되지 않은 task면 추가
+            this.selectedTasksMap.set(task.id, task);
+            console.log('Task added to selection:', task.id);
           }
 
-          // 현재 작업을 마지막 선택으로 저장
+          // HashMap의 값들을 배열로 변환하여 선택 상태 업데이트
+          const newSelection = Array.from(this.selectedTasksMap.values());
+          console.log('Updated selection:', newSelection.map(t => t.id));
+
+          updateSelection(newSelection);
           this.lastSelectedTaskId = task.id;
         }
         // 일반 클릭 (키 없이)
