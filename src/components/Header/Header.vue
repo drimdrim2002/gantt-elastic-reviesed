@@ -25,13 +25,13 @@
     </div>
     <div class="gantt-elastic__header-options" :style="{ ...style['header-options'] }">
       <div class="gantt-elastic__header-controls" :style="{ ...style['header-controls'] }">
-        <button
+        <!-- <button
           class="gantt-elastic__header-btn-recenter"
           :style="{ ...style['header-btn-recenter'] }"
           @click.prevent="recenterPosition"
         >
           {{ opts.locale.Now }}
-        </button>
+        </button> -->
         <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
           {{ opts.locale['X-Scale'] }}
           <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
@@ -112,7 +112,6 @@ const defaultStyle = {
   },
   'header-title': { float: 'left' },
   'header-options': {
-    float: 'right',
     display: 'flex',
     'align-items': 'center',
     'justify-content': 'space-between',
@@ -121,12 +120,14 @@ const defaultStyle = {
   'header-controls': {
     display: 'flex',
     'align-items': 'center',
-    'margin-right': 'auto',
-    gap: '20px'
+    gap: '20px',
+    'justify-content': 'flex-start'
   },
   'header-buttons': {
     display: 'flex',
-    'align-items': 'center'
+    'align-items': 'center',
+    gap: '20px',
+    'justify-content': 'flex-end'
   },
   'header-title--text': {
     'font-size': '20px',
@@ -161,7 +162,6 @@ const defaultStyle = {
     cursor: 'pointer',
     color: 'white',
     'border-radius': '3px',
-    'margin-right': '27px',
     'font-size': '16px',
     padding: '8px 12px'
   },
@@ -186,8 +186,7 @@ const defaultStyle = {
     padding: '8px 16px',
     'border-radius': '4px',
     'font-size': '14px',
-    'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.1)',
-    'margin-right': '20px'
+    'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
   }
 };
 const defaultOptions = {
