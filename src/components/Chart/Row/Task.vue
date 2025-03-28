@@ -229,12 +229,26 @@ export default {
 
     onPopupClick(event) {
       // 이벤트 버블링 중단
+      event.preventDefault();
       event.stopPropagation();
-      console.log('onPopupClick');
 
-      this.$emit('chart-task-popup-click', {
+      // 클릭한 위치 계산
+      const rect = event.target.getBoundingClientRect();
+      const x = event.clientX;
+      const y = event.clientY;
+
+      // 팝업 표시를 위한 이벤트 발생
+      this.root.$emit('task-contextmenu', {
         task: this.task,
-        event: event
+        position: { x, y },
+        taskInfo: {
+          id: this.task.id,
+          label: this.task.label,
+          start: this.task.start,
+          vhclId: this.task.vhclId,
+          row: this.task.row,
+          progress: this.task.progress
+        }
       });
     },
 

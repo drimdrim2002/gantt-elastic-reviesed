@@ -86,6 +86,31 @@
         :style="{ height: '1px', width: root.state.options.width + 'px' }"
       ></div>
     </div>
+
+    <!-- 오버레이와 컨텍스트 메뉴 -->
+    <div v-if="showContextMenu" class="context-menu-overlay">
+      <div
+        class="task-context-menu"
+        :style="{
+          position: 'fixed',
+          top: `${contextMenuPosition.y}px`,
+          left: `${contextMenuPosition.x}px`
+        }"
+        @click.stop
+      >
+        <div class="context-menu-header">
+          <strong>{{ selectedTaskInfo.label }}</strong>
+        </div>
+        <div class="context-menu-content">
+          <div class="task-info">
+            <div>ID: {{ selectedTaskInfo.id }}</div>
+            <div>차량: {{ selectedTaskInfo.vhclId }}</div>
+            <div>시작: {{ formatDateTime(selectedTaskInfo.start) }}</div>
+            <div>진행률: {{ selectedTaskInfo.progress }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -116,7 +141,10 @@ export default {
         positiveY: 0,
         currentX: 0,
         currentY: 0
-      }
+      },
+      showContextMenu: false,
+      contextMenuPosition: { x: 0, y: 0 },
+      selectedTaskInfo: null
     };
   },
   /**
@@ -126,18 +154,24 @@ export default {
     this.viewBoxWidth = this.$el.clientWidth;
     this.root.state.refs.mainView = this.$refs.mainView;
     this.root.state.refs.chartContainer = this.$refs.chartContainer;
-    
-    
+
     this.root.state.refs.taskList = this.$refs.taskList;
-    
-    
-    
+
     this.root.state.refs.chartScrollContainerHorizontal = this.$refs.chartScrollContainerHorizontal;
     this.root.state.refs.chartScrollContainerVertical = this.$refs.chartScrollContainerVertical;
     document.addEventListener('mouseup', this.chartMouseUp.bind(this));
     document.addEventListener('mousemove', this.chartMouseMove.bind(this));
     document.addEventListener('touchmove', this.chartMouseMove.bind(this));
     document.addEventListener('touchend', this.chartMouseUp.bind(this));
+
+    // 컨텍스트 메뉴 이벤트 리스너 등록
+    this.root.$on('task-contextmenu', this.showTaskContextMenu);
+
+    // 다른 곳 클릭시 컨텍스트 메뉴 닫기
+    document.addEventListener('click', this.hideContextMenu);
+
+    // ESC 키 이벤트 리스너 추가
+    document.addEventListener('keydown', this.handleKeyDown);
   },
   computed: {
     /**
@@ -278,6 +312,51 @@ export default {
         }
         vertical.scrollTop = y;
       }
+    },
+
+    showTaskContextMenu(data) {
+      this.showContextMenu = true;
+      this.contextMenuPosition = data.position;
+      this.selectedTaskInfo = data.taskInfo;
+
+      // 스크롤 방지
+      document.body.style.overflow = 'hidden';
+    },
+
+    hideContextMenu(event) {
+      // 컨텍스트 메뉴 영역 클릭시에는 닫지 않음
+      if (event && event.target.closest('.task-context-menu')) {
+        return;
+      }
+      this.showContextMenu = false;
+
+      // 스크롤 복원
+      document.body.style.overflow = '';
+    },
+
+    formatDateTime(timestamp) {
+      return new Date(timestamp).toLocaleString();
+    },
+
+    handleTaskEdit() {
+      // 작업 수정 로직 구현
+      console.log('Edit task:', this.selectedTaskInfo);
+      this.hideContextMenu();
+    },
+
+    handleTaskDelete() {
+      if (confirm(`작업 "${this.selectedTaskInfo.label}"을(를) 삭제하시겠습니까?`)) {
+        // 작업 삭제 로직 구현
+        console.log('Delete task:', this.selectedTaskInfo);
+      }
+      this.hideContextMenu();
+    },
+
+    // ESC 키로 팝업 닫기 추가
+    handleKeyDown(event) {
+      if (event.key === 'Escape' && this.showContextMenu) {
+        this.hideContextMenu();
+      }
     }
   },
 
@@ -289,6 +368,87 @@ export default {
     document.removeEventListener('mousemove', this.chartMouseMove);
     document.removeEventListener('touchmove', this.chartMouseMove);
     document.removeEventListener('touchend', this.chartMouseUp);
+
+    // 이벤트 리스너 제거
+    this.root.$off('task-contextmenu', this.showTaskContextMenu);
+    document.removeEventListener('click', this.hideContextMenu);
+
+    // ESC 키 이벤트 리스너 제거
+    document.removeEventListener('keydown', this.handleKeyDown);
+
+    // 스크롤 상태 복원
+    document.body.style.overflow = '';
   }
 };
 </script>
+
+<style scoped>
+/* ... 기존 스타일 유지 ... */
+
+.context-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent; /* 배경은 투명하게 */
+  z-index: 999; /* task-context-menu보다 낮은 z-index */
+  cursor: default; /* 기본 커서로 변경 */
+}
+
+.task-context-menu {
+  z-index: 1000;
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+.context-menu-header {
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.context-menu-content {
+  padding: 8px 12px;
+}
+
+.task-info {
+  margin-bottom: 12px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.task-info > div {
+  margin: 4px 0;
+}
+
+.context-menu-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.context-menu-actions button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #42b983;
+  color: white;
+}
+
+.context-menu-actions .delete-btn {
+  background: #ff4444;
+}
+
+.context-menu-actions button:hover {
+  opacity: 0.9;
+}
+</style>
