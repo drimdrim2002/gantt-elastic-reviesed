@@ -397,30 +397,18 @@ export default {
 
           console.log(`this.root.state.options.originYByRowIndex`, this.root.state.options.originYByRowIndex);
 
+          selectedTask.row = toRow;
           selectedTask.y = this.root.state.options.originYByRowIndex[toRow.toString()];
           // console.log(`task 배치 후후: `);
           // console.dir(selectedTask);
         });
 
         if (copiedSelectedTasks.length > 0) {
-          console.log('alert!!');
-
-          // 팝업 표시를 위한 이벤트 발생
-          this.$emit('chart-task-showMoveConfirmation', {
-            tasks: copiedSelectedTasks,
-            originalTasks: this.originalPositions,
-            toRow: toRow,
-            fromRow: fromRow
-          });
-
-          console.log('emit chart-task-showMoveConfirmation gogo');
-
           // 팝업 응답을 기다리기 위해 여기서 함수 종료
         }
 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-
         // 올바른 이벤트 이름으로 변경
         this.$emit('chart-task-taskDragEnd', {
           selectedTasks: copiedSelectedTasks,
@@ -428,7 +416,6 @@ export default {
           originalTasks: this.originalPositions,
           toRow: toRow
         });
-
         // 드래그 완료 후 선택 초기화
         setTimeout(() => {
           // 모든 선택 초기화

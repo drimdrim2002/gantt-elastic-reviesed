@@ -1661,6 +1661,8 @@ const GanttElastic = {
 
       this.state.tasks.forEach(task => {
         if (changedIdMap[task.id]) {
+          console.log('apply task', task.id);
+
           task.x = changedIdMap[task.id].x;
           task.y = changedIdMap[task.id].y;
           task.start = changedIdMap[task.id].start;
