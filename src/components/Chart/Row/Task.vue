@@ -46,8 +46,6 @@
       :height="this.circleRadius * 2"
       :viewBox="viewBoxValue"
       @click="onTaskClick"
-      @mouseenter="showTooltip"
-      @mouseleave="hideTooltip"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
@@ -103,15 +101,6 @@
         stroke-opacity="1"
       />
     </svg>
-    <!-- SVG foreignObject 기반 툴팁 -->
-    <foreignObject v-if="showingTooltip" :x="tooltipX" :y="tooltipY" width="200" height="100" class="task-tooltip">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="tooltip-content">
-        <div><strong>Task:</strong> {{ task.label }}</div>
-        <div><strong>Start:</strong> {{ formatDate(task.start) }}</div>
-        <div><strong>Duration:</strong> {{ formatDuration(task.duration) }}</div>
-        <div><strong>Progress:</strong> {{ task.progress }}%</div>
-      </div>
-    </foreignObject>
   </g>
 </template>
 
@@ -140,10 +129,7 @@ export default {
       dragStartX: 0,
       dragStartY: 0,
       originalPositions: [],
-      isSelected: false,
-      showingTooltip: false,
-      tooltipX: 0,
-      tooltipY: 0
+      isSelected: false
     };
   },
   computed: {
@@ -179,38 +165,6 @@ export default {
   },
   methods: {
     /**
-     * Show tooltip
-     */
-    showTooltip(event) {
-      // 먼저 이벤트 전달
-      this.emitEvent('mouseenter', event);
-
-      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
-      event.stopPropagation();
-
-      const tooltipHeight = 100;
-      const taskWidth = this.circleRadius * 2;
-      const tooltipOffset = 10;
-      this.tooltipX = Number(this.task.x) + taskWidth + tooltipOffset;
-      this.tooltipY = Number(this.task.y) - tooltipHeight / 2;
-
-      this.showingTooltip = true;
-    },
-
-    /**
-     * Hide tooltip
-     */
-    hideTooltip(event) {
-      // 먼저 이벤트 전달
-      this.emitEvent('mouseleave', event);
-
-      // 일관된 패턴: 모든 이벤트에 대해 stopPropagation
-      event.stopPropagation();
-
-      this.showingTooltip = false;
-    },
-
-    /**
      * Format date
      */
     formatDate(timestamp) {
@@ -227,13 +181,7 @@ export default {
     },
 
     onTaskClick(event) {
-      // 먼저 이벤트 전달
-      // this.emitEvent('click', event); // 중복 이벤트 발생 방지를 위해 제거
-
-      // 이벤트 버블링 중단
       event.stopPropagation();
-
-      // 올바른 이벤트 이름으로 변경
       this.$emit('chart-task-click', {
         task: this.task,
         event: event
@@ -244,10 +192,6 @@ export default {
      * Task 드래그 시작
      */
     onDragStart(event) {
-      // 먼저 이벤트 전달
-      this.emitEvent('dragstart', event);
-      this.emitEvent('mousedown', event);
-
       event.preventDefault();
       event.stopPropagation();
 
@@ -355,11 +299,6 @@ export default {
         let toRow = -1;
         // 1. 먼저 각 task의 row 계산
         copiedSelectedTasks.forEach(selectedTask => {
-          // console.log(`task 배치 전: `);
-          // console.dir(selectedTask);
-
-          // 현재 y 위치에 해당하는 row 계산 (반올림)
-
           for (let boundary of this.root.state.options.rowBoundaries) {
             if (selectedTask.y >= boundary.min && selectedTask.y < boundary.max) {
               toRow = boundary.row;
@@ -370,8 +309,6 @@ export default {
           console.log(`this.root.state.options.originYByRowIndex`, this.root.state.options.originYByRowIndex);
 
           selectedTask.y = this.root.state.options.originYByRowIndex[toRow.toString()];
-          // console.log(`task 배치 후후: `);
-          // console.dir(selectedTask);
         });
 
         document.removeEventListener('mousemove', onMouseMove);
