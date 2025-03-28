@@ -65,6 +65,7 @@
               <component
                 :task="task"
                 :is="task.type"
+                @task-click="$emit('task-click', $event)"
                 @chart-task-click="handleTaskSelection"
                 @chart-task-taskDragging="onTaskDragging"
                 @chart-task-taskDragEnd="onTaskDragEnd"

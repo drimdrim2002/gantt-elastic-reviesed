@@ -182,9 +182,13 @@ export default {
 
     onTaskClick(event) {
       event.stopPropagation();
-      this.$emit('chart-task-click', {
+      this.$emit('task-click', {
         task: this.task,
-        event: event
+        event: event,
+        position: {
+          x: event.clientX,
+          y: event.clientY
+        }
       });
     },
 
