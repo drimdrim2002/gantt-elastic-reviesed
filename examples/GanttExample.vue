@@ -3,8 +3,6 @@
     <gantt-elastic :tasks="tasks" :options="options" @task-selected="onTaskSelected">
       <gantt-header slot="header"></gantt-header>
     </gantt-elastic>
-    <!-- 선택된 task 개수 표시 -->
-    <div class="selected-tasks-count">선택된 Task: {{ selectedTasksCount }}개</div>
   </div>
 </template>
 
@@ -24,7 +22,6 @@ export default {
     return {
       elasticComponentReady: false,
       tasks: [],
-      selectedTasksCount: 0,
       options: {
         times: {
           timeScale: 60 * 1000,
@@ -203,7 +200,6 @@ export default {
     },
     onTaskSelected({ selectedTasks, count }) {
       console.log('Task selected:', selectedTasks, count);
-      this.selectedTasksCount = count;
     }
   },
 
@@ -233,18 +229,5 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-}
-
-.selected-tasks-count {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background-color: #42b983;
-  color: red;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
 }
 </style>

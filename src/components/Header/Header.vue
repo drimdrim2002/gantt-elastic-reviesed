@@ -25,6 +25,13 @@
     </div>
     <div class="gantt-elastic__header-options" :style="{ ...style['header-options'] }">
       <div class="gantt-elastic__header-controls" :style="{ ...style['header-controls'] }">
+        <button
+          class="gantt-elastic__header-btn-recenter"
+          :style="{ ...style['header-btn-recenter'] }"
+          @click.prevent="recenterPosition"
+        >
+          {{ opts.locale.Now }}
+        </button>
         <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
           {{ opts.locale['X-Scale'] }}
           <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
@@ -73,13 +80,9 @@
         </label>
       </div>
       <div class="gantt-elastic__header-buttons" :style="{ ...style['header-buttons'] }">
-        <button
-          class="gantt-elastic__header-btn-recenter"
-          :style="{ ...style['header-btn-recenter'] }"
-          @click.prevent="recenterPosition"
-        >
-          {{ opts.locale.Now }}
-        </button>
+        <div class="selected-tasks-count" :style="{ ...style['selected-tasks-count'] }">
+          Selected Task: {{ selectedTasksCount }}
+        </div>
         <button
           class="gantt-elastic__header-btn-save"
           :style="{ ...style['header-btn-save'] }"
@@ -118,12 +121,12 @@ const defaultStyle = {
   'header-controls': {
     display: 'flex',
     'align-items': 'center',
-    'margin-right': 'auto'
+    'margin-right': 'auto',
+    gap: '20px'
   },
   'header-buttons': {
     display: 'flex',
-    'align-items': 'center',
-    'margin-left': '20px'
+    'align-items': 'center'
   },
   'header-title--text': {
     'font-size': '20px',
@@ -148,7 +151,6 @@ const defaultStyle = {
     cursor: 'pointer',
     color: 'white',
     'border-radius': '3px',
-    'margin-right': '27px',
     'font-size': '16px',
     padding: '8px 12px'
   },
@@ -177,7 +179,16 @@ const defaultStyle = {
     margin: '0px 15px',
     'vertical-align': 'middle'
   },
-  'header-label': {}
+  'header-label': {},
+  'selected-tasks-count': {
+    'background-color': '#42b983',
+    color: 'red',
+    padding: '8px 16px',
+    'border-radius': '4px',
+    'font-size': '14px',
+    'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.1)',
+    'margin-right': '20px'
+  }
 };
 const defaultOptions = {
   title: {
@@ -185,7 +196,7 @@ const defaultOptions = {
     html: false
   },
   locale: {
-    Now: 'Back to Start',
+    Now: 'Back',
     'X-Scale': 'Zoom',
     'Task list width': 'Vehicle List',
     'Display task list': 'Show Vehicle List',
@@ -208,6 +219,7 @@ export default {
       firstScale: false,
       localScale: 0,
       localPercent: 0,
+      selectedTasksCount: 0,
       sliderOptions: {
         xScale: {
           value: 0
@@ -226,6 +238,10 @@ export default {
 
     this.root.$on('times-timeZoom-updated', newZoom => {
       this.localScale = newZoom;
+    });
+
+    this.root.$on('task-selected', ({ count }) => {
+      this.selectedTasksCount = count;
     });
   },
   methods: {
@@ -329,6 +345,7 @@ export default {
   beforeDestroy() {
     // 이벤트 리스너 제거
     this.root.$off('times-timeZoom-updated');
+    this.root.$off('task-selected');
   }
 };
 </script>
