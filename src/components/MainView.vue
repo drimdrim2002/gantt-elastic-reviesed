@@ -98,16 +98,33 @@
         }"
         @click.stop
       >
-        <div class="context-menu-header">
-          <strong>{{ selectedTaskInfo.label }}</strong>
+        <div
+          class="context-menu-header"
+          :style="{
+            background: selectedTaskInfo.color || '#42b983',
+            color: '#ffffff', // 텍스트 색상을 흰색으로 변경
+            height: '15px'
+          }"
+        >
+          <strong> Customer Information</strong>
         </div>
         <div class="context-menu-content">
-          <div class="task-info">
-            <div>ID: {{ selectedTaskInfo.id }}</div>
-            <div>차량: {{ selectedTaskInfo.vhclId }}</div>
-            <div>시작: {{ formatDateTime(selectedTaskInfo.start) }}</div>
-            <div>진행률: {{ selectedTaskInfo.progress }}%</div>
-          </div>
+          <table class="task-info-table">
+            <tbody>
+              <tr>
+                <td class="label">Vehicle</td>
+                <td class="value">{{ selectedTaskInfo.vhclId }}</td>
+              </tr>
+              <tr>
+                <td class="label">Stop Seq No</td>
+                <td class="value">{{ selectedTaskInfo.label }}</td>
+              </tr>
+              <tr>
+                <td class="label">Arrival Time</td>
+                <td class="value">{{ formatDateTime(selectedTaskInfo.start) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -408,23 +425,45 @@ export default {
 
 .context-menu-header {
   padding: 8px 12px;
-  background: #f5f5f5;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
   border-bottom: 1px solid #ddd;
   font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 .context-menu-content {
   padding: 8px 12px;
 }
 
-.task-info {
+.task-info-table {
+  width: 100%;
+  border-collapse: collapse;
   margin-bottom: 12px;
   font-size: 0.9em;
-  color: #666;
+  border: 1px solid black;
 }
 
-.task-info > div {
-  margin: 4px 0;
+.task-info-table td {
+  padding: 4px 0;
+  border-bottom: 1px solid black;
+}
+
+.task-info-table td:last-child {
+  border-bottom: none;
+}
+
+.task-info-table .label {
+  color: #666;
+  width: 40%;
+  font-weight: 500;
+  border: 1px solid black;
+}
+
+.task-info-table .value {
+  color: #333;
+  text-align: right;
+  border: 1px solid black;
 }
 
 .context-menu-actions {

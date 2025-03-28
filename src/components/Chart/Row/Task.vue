@@ -228,26 +228,30 @@ export default {
     },
 
     onPopupClick(event) {
-      // 이벤트 버블링 중단
+      console.log(`onPopupClick`);
       event.preventDefault();
       event.stopPropagation();
 
-      // 클릭한 위치 계산
       const rect = event.target.getBoundingClientRect();
       const x = event.clientX;
       const y = event.clientY;
 
-      // 팝업 표시를 위한 이벤트 발생
+      // task의 색상 정보를 가져옵니다
+      const taskColor = (this.task.style && this.task.style.base && this.task.style.base.fill) || '#42b983';
+      const startTime = this.task.start || this.task.startTime;
+
+      console.log(`this.task.start`, startTime);
       this.root.$emit('task-contextmenu', {
         task: this.task,
         position: { x, y },
         taskInfo: {
           id: this.task.id,
           label: this.task.label,
-          start: this.task.start,
+          start: this.task.start || this.task.startTime,
           vhclId: this.task.vhclId,
           row: this.task.row,
-          progress: this.task.progress
+          progress: this.task.progress,
+          color: taskColor // 색상 정보 추가
         }
       });
     },
