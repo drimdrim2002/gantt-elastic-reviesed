@@ -24,100 +24,70 @@
       ></div>
     </div>
     <div class="gantt-elastic__header-options" :style="{ ...style['header-options'] }">
-      <button
-        class="gantt-elastic__header-btn-recenter"
-        :style="{ ...style['header-btn-recenter'] }"
-        @click.prevent="recenterPosition"
-      >
-        {{ opts.locale.Now }}
-      </button>
-      <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
-        {{ opts.locale['X-Scale'] }}
-        <div
-          class="gantt-elastic__header-slider-wrapper"
-          :style="{ ...style['header-slider-wrapper'] }"
+      <div class="gantt-elastic__header-controls" :style="{ ...style['header-controls'] }">
+        <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
+          {{ opts.locale['X-Scale'] }}
+          <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
+            <vue-slider
+              class="gantt-elastic__header-slider"
+              tooltip="none"
+              :style="{ ...style['header-slider'] }"
+              :process-style="{ ...style['header-slider--process'] }"
+              :slider-style="{ ...style['header-slider--slider'] }"
+              v-model="scale"
+              :max="this.zoomMax"
+              :min="this.zoomMin"
+              :step="0.1"
+              :interval="0.1"
+              :duration="0"
+              width="100px"
+            ></vue-slider>
+          </div>
+        </label>
+        <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
+          {{ opts.locale['Task list width'] }}
+          <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
+            <vue-slider
+              class="gantt-elastic__header-slider"
+              tooltip="none"
+              :style="{ ...style['header-slider'] }"
+              :process-style="{ ...style['header-slider--process'] }"
+              :slider-style="{ ...style['header-slider--slider'] }"
+              v-model="divider"
+              :max="100"
+              :min="0"
+              width="100px"
+            ></vue-slider>
+          </div>
+        </label>
+        <label
+          class="gantt-elastic__header-task-list-switch--wrapper"
+          :style="{ ...style['header-task-list-switch--label'] }"
         >
-          <vue-slider
-            class="gantt-elastic__header-slider"
-            tooltip="none"
-            :style="{ ...style['header-slider'] }"
-            :process-style="{ ...style['header-slider--process'] }"
-            :slider-style="{ ...style['header-slider--slider'] }"
-            v-model="scale"
-            :max="this.zoomMax"
-            :min="this.zoomMin"
-            :step="0.1"
-            :interval="0.1"
-            :duration="0"
-            width="100px"
-          ></vue-slider>
-        </div>
-      </label>
-      <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
-        {{ opts.locale['Y-Scale'] }}
-        <div
-          class="gantt-elastic__header-slider-wrapper"
-          :style="{ ...style['header-slider-wrapper'] }"
+          <switches
+            class="gantt-elastic__header-task-list-switch"
+            :style="{ ...style['header-task-list-switch'] }"
+            v-model="root.state.options.taskList.display"
+          ></switches>
+          {{ opts.locale['Display task list'] }}
+        </label>
+      </div>
+      <div class="gantt-elastic__header-buttons" :style="{ ...style['header-buttons'] }">
+        <button
+          class="gantt-elastic__header-btn-recenter"
+          :style="{ ...style['header-btn-recenter'] }"
+          @click.prevent="recenterPosition"
         >
-          <vue-slider
-            class="gantt-elastic__header-slider"
-            tooltip="none"
-            :style="{ ...style['header-slider'] }"
-            :process-style="{ ...style['header-slider--process'] }"
-            :slider-style="{ ...style['header-slider--slider'] }"
-            v-model="height"
-            :max="100"
-            :min="7"
-            width="100px"
-          ></vue-slider>
-        </div>
-      </label>
-      <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
-        {{ opts.locale['Before/After'] }}
-        <div
-          class="gantt-elastic__header-slider-wrapper"
-          :style="{ ...style['header-slider-wrapper'] }"
+          {{ opts.locale.Now }}
+        </button>
+        <button
+          class="gantt-elastic__header-btn-save"
+          :style="{ ...style['header-btn-save'] }"
+          @click.prevent="saveState"
         >
-          <vue-slider
-            class="gantt-elastic__header-slider"
-            tooltip="none"
-            :style="{ ...style['header-slider'] }"
-            :process-style="{ ...style['header-slider--process'] }"
-            :slider-style="{ ...style['header-slider--slider'] }"
-            v-model="scope"
-            :max="2"
-            :min="0"
-            width="100px"
-          ></vue-slider>
-        </div>
-      </label>
-      <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
-        {{ opts.locale['Task list width'] }}
-        <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
-          <vue-slider
-            class="gantt-elastic__header-slider"
-            tooltip="none"
-            :style="{ ...style['header-slider'] }"
-            :process-style="{ ...style['header-slider--process'] }"
-            :slider-style="{ ...style['header-slider--slider'] }"
-            v-model="divider"
-            :max="100"
-            :min="0"
-            width="100px"
-          ></vue-slider>
-        </div>
-      </label>
-      <label
-        class="gantt-elastic__header-task-list-switch--wrapper"
-        :style="{ ...style['header-task-list-switch--label'] }"
-      >
-        <switches
-          class="gantt-elastic__header-task-list-switch"
-          :style="{ ...style['header-task-list-switch'] }"
-          v-model="root.state.options.taskList.display"
-        ></switches>
-        {{ opts.locale['Display task list'] }}
-      </label>
+          {{ opts.locale.Save }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -126,7 +96,6 @@
 import vueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 import Switches from 'vue-switches';
-
 
 const defaultStyle = {
   header: {
@@ -139,7 +108,23 @@ const defaultStyle = {
     'justify-content': 'space-between'
   },
   'header-title': { float: 'left' },
-  'header-options': { float: 'right' },
+  'header-options': {
+    float: 'right',
+    display: 'flex',
+    'align-items': 'center',
+    'justify-content': 'space-between',
+    width: '100%'
+  },
+  'header-controls': {
+    display: 'flex',
+    'align-items': 'center',
+    'margin-right': 'auto'
+  },
+  'header-buttons': {
+    display: 'flex',
+    'align-items': 'center',
+    'margin-left': '20px'
+  },
   'header-title--text': {
     'font-size': '20px',
     'vertical-align': 'middle',
@@ -158,6 +143,17 @@ const defaultStyle = {
   },
   'header-btn-recenter': {
     background: '#95A5A6',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+    color: 'white',
+    'border-radius': '3px',
+    'margin-right': '27px',
+    'font-size': '16px',
+    padding: '8px 12px'
+  },
+  'header-btn-save': {
+    background: '#42b983',
     border: 'none',
     outline: 'none',
     cursor: 'pointer',
@@ -189,12 +185,11 @@ const defaultOptions = {
     html: false
   },
   locale: {
-    Now: 'Start',
-    'X-Scale': 'Zoom-X',
-    'Y-Scale': 'Zoom-Y',
-    'Task list width': 'Task list',
-    'Before/After': 'Expand',
-    'Display task list': 'Show task list'
+    Now: 'Back to Start',
+    'X-Scale': 'Zoom',
+    'Task list width': 'Vehicle List',
+    'Display task list': 'Show Vehicle List',
+    Save: 'Save'
   }
 };
 export default {
@@ -207,14 +202,11 @@ export default {
   inject: ['root'],
   data() {
     return {
-      // zoomMax: 5,
       zoomMin: 1,
       zoomStep: 0.1,
       scaleTimeoutId: null,
       firstScale: false,
       localScale: 0,
-      localHeight: 0,
-      localBefore: 0,
       localPercent: 0,
       sliderOptions: {
         xScale: {
@@ -227,15 +219,12 @@ export default {
   },
   created() {
     this.localScale = this.root.state.options.times.timeZoom;
-    this.localHeight = this.root.state.options.row.height;
-    this.localBefore = this.root.state.options.scope.before;
     this.localPercent = this.root.state.options.taskList.percent;
     this.sliderOptions.xScale.value = this.root.state.options.times.timeZoom;
     this.style = this.root.mergeDeep({}, defaultStyle, this.dynamicStyle);
     this.opts = this.root.mergeDeep({}, defaultOptions, this.options);
-    
-    // 마우스 휠로 zoom level이 변경될 때 zoom-slider 값을 업데이트
-    this.root.$on('times-timeZoom-updated', (newZoom) => {
+
+    this.root.$on('times-timeZoom-updated', newZoom => {
       this.localScale = newZoom;
     });
   },
@@ -252,6 +241,17 @@ export default {
     },
     recenterPosition() {
       this.root.$emit('recenterPosition');
+    },
+    saveState() {
+      const state = {
+        timeZoom: this.localScale,
+        taskListPercent: this.localPercent,
+        taskListDisplay: this.root.state.options.taskList.display,
+        currentTime: this.root.state.options.times.currentTime
+      };
+
+      localStorage.setItem('ganttState', JSON.stringify(state));
+      alert('상태가 저장되었습니다.');
     },
     setScale(value) {
       if (this.scaleTimeoutId !== null) {
@@ -294,16 +294,15 @@ export default {
     },
 
     zoomMax() {
-     
       const steps = this.root.state.options.times.steps || [];
       const daysCount = steps.length;
-      if (steps.length <= 1 ) {
+      if (steps.length <= 1) {
         return 2;
       } else {
         return 2 * daysCount;
       }
     },
-    
+
     scale: {
       get() {
         return this.localScale;
@@ -311,24 +310,6 @@ export default {
       set(value) {
         this.localScale = parseFloat(value.toFixed(1));
         this.setScale(this.localScale);
-      }
-    },
-    height: {
-      get() {
-        return this.localHeight;
-      },
-      set(value) {
-        this.localHeight = Number(value);
-        this.root.$emit('row-height-change', Number(value));
-      }
-    },
-    scope: {
-      get() {
-        return this.localBefore;
-      },
-      set(value) {
-        this.localBefore = Number(value);
-        this.root.$emit('scope-change', Number(value));
       }
     },
     divider: {
@@ -341,7 +322,7 @@ export default {
       }
     }
   },
-  
+
   /**
    * 컴포넌트가 제거되기 전에 이벤트 리스너 정리
    */
