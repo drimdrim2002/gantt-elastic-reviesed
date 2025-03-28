@@ -66,6 +66,7 @@
                 :task="task"
                 :is="task.type"
                 @chart-task-click="handleTaskSelection"
+                @chart-task-popup-click="handlePopupClick"
                 @chart-task-taskDragging="onTaskDragging"
                 @chart-task-taskDragEnd="onTaskDragEnd"
               ></component>
@@ -180,6 +181,9 @@ export default {
       document.querySelectorAll('.gantt-elastic__chart-row-task-wrapper.selected').forEach(el => {
         el.classList.remove('selected');
       });
+    },
+    handlePopupClick(event) {
+      console.log('handlePopupClick', event);
     },
     /**
      * Task 선택 처리

@@ -45,7 +45,9 @@
       :width="this.circleRadius * 2"
       :height="this.circleRadius * 2"
       :viewBox="viewBoxValue"
-      @click="onTaskClick"
+      @contextmenu.prevent="onPopupClick"
+      @click.right="onPopupClick"
+      @click.left="onTaskClick"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
@@ -220,6 +222,17 @@ export default {
 
       // 올바른 이벤트 이름으로 변경
       this.$emit('chart-task-click', {
+        task: this.task,
+        event: event
+      });
+    },
+
+    onPopupClick(event) {
+      // 이벤트 버블링 중단
+      event.stopPropagation();
+      console.log('onPopupClick');
+
+      this.$emit('chart-task-popup-click', {
         task: this.task,
         event: event
       });
