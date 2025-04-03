@@ -130,15 +130,23 @@
     </div>
 
     <!-- Task 이동 확인 팝업 -->
-    <div v-if="showMoveConfirm" class="task-move-confirm-popup" :style="moveConfirmStyle">
-      <div class="popup-header" :style="{ backgroundColor: moveConfirmTaskColor }">
-        <h3>Task 이동 확인</h3>
-      </div>
-      <div class="popup-content">
-        <p>선택한 Task를 이동하시겠습니까?</p>
-        <div class="button-group">
-          <button @click="confirmMove(true)" class="confirm-button">Confirm</button>
-          <button @click="confirmMove(false)" class="cancel-button">Cancel</button>
+    <div v-if="showMoveConfirm" class="modal-backdrop" @click="confirmMove(false)"></div>
+    <div v-if="showMoveConfirm" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Move Confirm</h5>
+            <button type="button" class="close" @click="confirmMove(false)" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Would you like to move the selected task?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="confirmMove(false)">Cancle</button>
+            <button type="button" class="btn btn-primary" @click="confirmMove(true)">Confirm</button>
+          </div>
         </div>
       </div>
     </div>
@@ -534,54 +542,146 @@ export default {
   opacity: 0.9;
 }
 
-.task-move-confirm-popup {
-  position: absolute;
-  background: white;
-  border: 2px solid black;
-  border-radius: 4px;
-  padding: 0;
-  z-index: 1000;
-  min-width: 200px;
+/* Bootstrap 스타일 모달 */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.task-move-confirm-popup .popup-header {
-  padding: 10px;
-  color: white;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1050;
+  display: block;
+  overflow: hidden;
+  outline: 0;
 }
 
-.task-move-confirm-popup .popup-header h3 {
-  margin: 0;
-  font-size: 16px;
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 1.75rem auto;
+  max-width: 500px;
+  pointer-events: none;
 }
 
-.task-move-confirm-popup .popup-content {
-  padding: 15px;
-}
-
-.task-move-confirm-popup .button-group {
+.modal-content {
+  position: relative;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
+  flex-direction: column;
+  width: 100%;
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.1rem;
+  outline: 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.task-move-confirm-popup button {
-  padding: 5px 15px;
-  border: none;
-  border-radius: 3px;
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  border-top-left-radius: 0.3rem;
+  border-top-right-radius: 0.3rem;
+  background-color: #2c3e50;
+  color: white;
+  min-height: 2.5rem;
+}
+
+.modal-title {
+  margin: 0;
+  line-height: 1.1;
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.close {
+  float: right;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  text-shadow: none;
+  opacity: 0.7;
+  background: transparent;
+  border: 0;
+  padding: 0;
   cursor: pointer;
-  font-weight: bold;
+  margin-left: 0.5rem;
 }
 
-.task-move-confirm-popup .confirm-button {
-  background-color: #42b983;
-  color: white;
+.close:hover {
+  opacity: 1;
 }
 
-.task-move-confirm-popup .cancel-button {
-  background-color: #dc3545;
-  color: white;
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid #e9ecef;
+  gap: 0.75rem;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.375rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  color: #fff;
+  background-color: #5a6268;
+  border-color: #545b62;
 }
 </style>
