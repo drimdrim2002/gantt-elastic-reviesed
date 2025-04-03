@@ -25,13 +25,6 @@
     </div>
     <div class="gantt-elastic__header-options" :style="{ ...style['header-options'] }">
       <div class="gantt-elastic__header-controls" :style="{ ...style['header-controls'] }">
-        <!-- <button
-          class="gantt-elastic__header-btn-recenter"
-          :style="{ ...style['header-btn-recenter'] }"
-          @click.prevent="recenterPosition"
-        >
-          {{ opts.locale.Now }}
-        </button> -->
         <label class="gantt-elastic__header-label" :style="{ ...style['header-label'] }">
           {{ opts.locale['X-Scale'] }}
           <div class="gantt-elastic__header-slider-wrapper" :style="{ ...style['header-slider-wrapper'] }">
@@ -83,6 +76,14 @@
         <div class="selected-tasks-count" :style="{ ...style['selected-tasks-count'] }">
           Selected Task: {{ selectedTasksCount }}
         </div>
+        <button
+          class="gantt-elastic__header-btn-refresh"
+          :style="{ ...style['header-btn-refresh'] }"
+          @click.prevent="refreshGantt"
+        >
+          Refresh
+        </button>
+
         <button
           class="gantt-elastic__header-btn-save"
           :style="{ ...style['header-btn-save'] }"
@@ -156,14 +157,18 @@ const defaultStyle = {
     padding: '8px 12px'
   },
   'header-btn-save': {
-    background: '#42b983',
-    border: 'none',
+    background: '#28a745',
+    border: '1px solid #28a745',
     outline: 'none',
     cursor: 'pointer',
     color: 'white',
-    'border-radius': '3px',
-    'font-size': '16px',
-    padding: '8px 12px'
+    'border-radius': '6px',
+    'font-size': '13px',
+    padding: '8px 16px',
+    'font-weight': '500',
+    transition: 'all 0.2s ease-in-out',
+    'box-shadow': '0 1px 2px rgba(0, 0, 0, 0.05)',
+    'min-height': '36px'
   },
   'header-slider': {
     'box-sizing': 'content-box'
@@ -181,12 +186,35 @@ const defaultStyle = {
   },
   'header-label': {},
   'selected-tasks-count': {
-    'background-color': '#42b983',
-    color: 'red',
+    'background-color': '#e9ecef',
+    color: '#495057',
+    padding: '3px 10px',
+    'border-radius': '6px',
+    'font-size': '13px',
+    'box-shadow': '0 1px 2px rgba(0, 0, 0, 0.05)',
+    border: '1px solid #dee2e6',
+    'font-weight': '500',
+    'min-height': '28px',
+    display: 'flex',
+    'align-items': 'center',
+    'line-height': '1'
+  },
+  'header-btn-refresh': {
+    background: '#e3f2fd',
+    border: '1px solid #90caf9',
+    outline: 'none',
+    cursor: 'pointer',
+    color: '#1976d2',
+    'border-radius': '6px',
+    'font-size': '13px',
     padding: '8px 16px',
-    'border-radius': '4px',
-    'font-size': '14px',
-    'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
+    display: 'flex',
+    'align-items': 'center',
+    'justify-content': 'center',
+    transition: 'all 0.2s ease-in-out',
+    'box-shadow': '0 1px 2px rgba(0, 0, 0, 0.05)',
+    'font-weight': '500',
+    'min-height': '36px'
   }
 };
 const defaultOptions = {
@@ -283,6 +311,9 @@ export default {
         this.root.$emit('times-timeZoom-change', parseFloat(value.toFixed(1)));
         this.firstScale = true;
       }
+    },
+    refreshGantt() {
+      this.root.$emit('refresh-gantt');
     }
   },
   computed: {
@@ -364,5 +395,30 @@ export default {
 
 .gantt-elastic__header-slider-wrapper {
   position: relative;
+}
+
+.gantt-elastic__header-btn-refresh:hover {
+  background-color: #bbdefb;
+  border-color: #64b5f6;
+  transform: translateY(-1px);
+}
+
+.gantt-elastic__header-btn-refresh i {
+  font-size: 13px;
+  margin-right: 4px;
+  color: #1976d2;
+}
+
+.gantt-elastic__header-btn-save:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.gantt-elastic__header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
 }
 </style>
