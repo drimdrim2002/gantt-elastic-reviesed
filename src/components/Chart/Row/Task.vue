@@ -409,13 +409,7 @@ export default {
 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        // 올바른 이벤트 이름으로 변경
-        this.$emit('chart-task-taskDragEnd', {
-          selectedTasks: copiedSelectedTasks,
-          event: e,
-          originalTasks: this.originalPositions,
-          toRow: toRow
-        });
+
         // 드래그 완료 후 선택 초기화
         setTimeout(() => {
           // 모든 선택 초기화
@@ -429,6 +423,14 @@ export default {
           // 선택 표시 원 제거를 위해 isSelected 상태 업데이트
           this.isSelected = false;
         }, 100); // 약간의 지연을 두어 이벤트 처리 완료 후 초기화되도록 함
+
+        // 올바른 이벤트 이름으로 변경
+        this.$emit('chart-task-taskDragEnd', {
+          selectedTasks: copiedSelectedTasks,
+          event: e,
+          originalTasks: this.originalPositions,
+          toRow: toRow
+        });
       };
 
       document.addEventListener('mousemove', onMouseMove);
