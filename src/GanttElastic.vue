@@ -1735,7 +1735,7 @@ const GanttElastic = {
         }
         task.height = this.state.options.row.height;
 
-        task.x = this.timeToPixelOffsetX(task.start || task.startTime);
+        task.x = this.timeToPixelOffsetX(task.startTime);
         task.y =
           (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) * task.row +
           this.state.options.chart.grid.horizontal.gap;

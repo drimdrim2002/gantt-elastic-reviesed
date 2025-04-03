@@ -128,6 +128,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Task 이동 확인 팝업 -->
+    <div v-if="showMoveConfirm" class="task-move-confirm-popup" :style="moveConfirmStyle">
+      <div class="popup-header" :style="{ backgroundColor: moveConfirmTaskColor }">
+        <h3>Task 이동 확인</h3>
+      </div>
+      <div class="popup-content">
+        <p>선택한 Task를 이동하시겠습니까?</p>
+        <div class="button-group">
+          <button @click="confirmMove(true)" class="confirm-button">Confirm</button>
+          <button @click="confirmMove(false)" class="cancel-button">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -161,7 +175,11 @@ export default {
       },
       showContextMenu: false,
       contextMenuPosition: { x: 0, y: 0 },
-      selectedTaskInfo: null
+      selectedTaskInfo: null,
+      showMoveConfirm: false,
+      moveConfirmStyle: {},
+      moveConfirmTaskColor: '#42b983',
+      moveConfirmCallback: null
     };
   },
   /**
@@ -374,6 +392,16 @@ export default {
       if (event.key === 'Escape' && this.showContextMenu) {
         this.hideContextMenu();
       }
+    },
+
+    confirmMove(confirmed) {
+      if (this.moveConfirmCallback) {
+        this.moveConfirmCallback(confirmed);
+      }
+      this.showMoveConfirm = false;
+      this.moveConfirmCallback = null;
+      this.moveConfirmStyle = {};
+      this.moveConfirmTaskColor = '#42b983';
     }
   },
 
@@ -395,6 +423,21 @@ export default {
 
     // 스크롤 상태 복원
     document.body.style.overflow = '';
+  },
+
+  created() {
+    this.root.$on('task-move-confirm', ({ tasks, originalPositions, toRow, callback }) => {
+      this.showMoveConfirm = true;
+      this.moveConfirmTaskColor = (tasks[0].style && tasks[0].style.base && tasks[0].style.base.fill) || '#42b983';
+      this.moveConfirmCallback = callback;
+
+      // 팝업 위치 설정
+      const firstTask = tasks[0];
+      this.moveConfirmStyle = {
+        left: `${firstTask.x}px`,
+        top: `${firstTask.y}px`
+      };
+    });
   }
 };
 </script>
@@ -489,5 +532,56 @@ export default {
 
 .context-menu-actions button:hover {
   opacity: 0.9;
+}
+
+.task-move-confirm-popup {
+  position: absolute;
+  background: white;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 0;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.task-move-confirm-popup .popup-header {
+  padding: 10px;
+  color: white;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.task-move-confirm-popup .popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.task-move-confirm-popup .popup-content {
+  padding: 15px;
+}
+
+.task-move-confirm-popup .button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.task-move-confirm-popup button {
+  padding: 5px 15px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.task-move-confirm-popup .confirm-button {
+  background-color: #42b983;
+  color: white;
+}
+
+.task-move-confirm-popup .cancel-button {
+  background-color: #dc3545;
+  color: white;
 }
 </style>

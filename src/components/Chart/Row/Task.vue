@@ -405,6 +405,55 @@ export default {
 
         if (copiedSelectedTasks.length > 0) {
           // 팝업 응답을 기다리기 위해 여기서 함수 종료
+          this.root.$emit('task-move-confirm', {
+            tasks: copiedSelectedTasks,
+            originalPositions: this.originalPositions,
+            toRow: toRow,
+            callback: confirmed => {
+              if (!confirmed) {
+                // 취소 시 원래 위치로 복원
+                this.originalPositions.forEach(original => {
+                  const task = copiedSelectedTasks.find(t => t.id === original.id);
+                  if (task) {
+                    task.x = original.x;
+                    task.y = original.y;
+                    task.start = original.start;
+                    task.row = original.row;
+                    task.vhclId = original.vhclId;
+                    task.dependentOn = original.dependentOn;
+                  }
+                });
+                return;
+              }
+
+              // 확인 시 다음 단계 진행
+              document.removeEventListener('mousemove', onMouseMove);
+              document.removeEventListener('mouseup', onMouseUp);
+
+              // 드래그 완료 후 선택 초기화
+              setTimeout(() => {
+                // 모든 선택 초기화
+                this.root.updateSelectedTasks([]);
+
+                // 모든 task의 선택 상태 시각적 표시 제거
+                document.querySelectorAll('.gantt-elastic__chart-row-task-wrapper.selected').forEach(el => {
+                  el.classList.remove('selected');
+                });
+
+                // 선택 표시 원 제거를 위해 isSelected 상태 업데이트
+                this.isSelected = false;
+              }, 100);
+
+              // 올바른 이벤트 이름으로 변경
+              this.$emit('chart-task-taskDragEnd', {
+                selectedTasks: copiedSelectedTasks,
+                event: e,
+                originalTasks: this.originalPositions,
+                toRow: toRow
+              });
+            }
+          });
+          return;
         }
 
         document.removeEventListener('mousemove', onMouseMove);
@@ -428,7 +477,7 @@ export default {
 
           // 선택 표시 원 제거를 위해 isSelected 상태 업데이트
           this.isSelected = false;
-        }, 100); // 약간의 지연을 두어 이벤트 처리 완료 후 초기화되도록 함
+        }, 100);
       };
 
       document.addEventListener('mousemove', onMouseMove);
