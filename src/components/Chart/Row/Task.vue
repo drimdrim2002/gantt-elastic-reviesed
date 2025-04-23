@@ -45,6 +45,8 @@
       :width="this.circleRadius * 2"
       :height="this.circleRadius * 2"
       :viewBox="viewBoxValue"
+      @contextmenu.prevent="onContextMenu"
+      @click.right.prevent="onContextMenu"
       @click.left="onTaskClick"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
@@ -219,6 +221,45 @@ export default {
       this.$emit('chart-task-click', {
         task: this.task,
         event: event
+      });
+    },
+
+    /**
+     * 우클릭 컨텍스트 메뉴 이벤트 핸들러
+     */
+    onContextMenu(event) {
+      // 이벤트 버블링과 기본 컨텍스트 메뉴를 방지
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 클릭 위치 좌표 가져오기
+      const x = event.clientX;
+      const y = event.clientY;
+
+      // task의 색상 정보
+      const taskColor = (this.task.style && this.task.style.base && this.task.style.base.fill) || '#42b983';
+
+      // 상위 컴포넌트로 이벤트 emit
+      this.root.$emit('task-context-menu', {
+        task: this.task,
+        position: { x, y },
+        taskInfo: {
+          id: this.task.id,
+          label: this.task.label,
+          start: this.task.start || this.task.startTime,
+          vhclId: this.task.vhclId,
+          row: this.task.row,
+          progress: this.task.progress,
+          color: taskColor
+        },
+        options: [{ id: 'open', label: 'Open Location Popup' }, { id: 'unroute', label: 'Unroute' }]
+      });
+
+      // 컴포넌트 자체에서도 이벤트 emit (상위 컴포넌트와의 양방향 통신을 위해)
+      this.$emit('chart-task-context-menu', {
+        task: this.task,
+        event: event,
+        position: { x, y }
       });
     },
 
