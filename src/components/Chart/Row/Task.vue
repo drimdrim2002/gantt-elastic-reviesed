@@ -45,8 +45,6 @@
       :width="this.circleRadius * 2"
       :height="this.circleRadius * 2"
       :viewBox="viewBoxValue"
-      @contextmenu.prevent="onPopupClick"
-      @click.right="onPopupClick"
       @click.left="onTaskClick"
       @mousedown.stop="onDragStart"
       @mousewheel="emitEvent('mousewheel', $event)"
@@ -214,9 +212,6 @@ export default {
     // },
 
     onTaskClick(event) {
-      // 먼저 이벤트 전달
-      // this.emitEvent('click', event); // 중복 이벤트 발생 방지를 위해 제거
-
       // 이벤트 버블링 중단
       event.stopPropagation();
 
@@ -224,35 +219,6 @@ export default {
       this.$emit('chart-task-click', {
         task: this.task,
         event: event
-      });
-    },
-
-    onPopupClick(event) {
-      console.log(`onPopupClick`);
-      event.preventDefault();
-      event.stopPropagation();
-
-      const rect = event.target.getBoundingClientRect();
-      const x = event.clientX;
-      const y = event.clientY;
-
-      // task의 색상 정보를 가져옵니다
-      const taskColor = (this.task.style && this.task.style.base && this.task.style.base.fill) || '#42b983';
-      const startTime = this.task.start || this.task.startTime;
-
-      console.log(`this.task.start`, startTime);
-      this.root.$emit('task-contextmenu', {
-        task: this.task,
-        position: { x, y },
-        taskInfo: {
-          id: this.task.id,
-          label: this.task.label,
-          start: this.task.start || this.task.startTime,
-          vhclId: this.task.vhclId,
-          row: this.task.row,
-          progress: this.task.progress,
-          color: taskColor // 색상 정보 추가
-        }
       });
     },
 

@@ -1868,6 +1868,22 @@ const GanttElastic = {
     });
     this.state.resizeObserver.observe(this.$el.parentNode);
     this.globalOnResize();
+
+    // refresh-gantt 이벤트 리스너 추가
+    this.$on('refresh-gantt', () => {
+      console.log('Refresh Gantt triggered');
+      // 이벤트 리스너 정리
+      this.beforeDestroy();
+      // 컴포넌트 재초기화
+      this.initializeEvents();
+      this.setup();
+      // mounted 훅의 나머지 로직 실행
+      this.$emit('ready', this);
+      this.$root.$emit('gantt-elastic-mounted', this);
+      this.$emit('mounted', this);
+      this.$root.$emit('gantt-elastic-ready', this);
+    });
+
     this.$emit('ready', this);
     this.$root.$emit('gantt-elastic-mounted', this);
     this.$emit('mounted', this);
